@@ -5,6 +5,8 @@
 # include <fstream>
 # include <ctime>
 # include <cstring>
+#include "mpi.h"
+
 
 using namespace std;
 int main(int argc, char** argv);
@@ -47,18 +49,17 @@ int main(int argc, char** argv)
 //
 {
 
-	if (argc < 2) {
-		std::cout << "Number of threads missing!" << std::endl;
-	}
+	// if (argc < 2) {
+	// 	std::cout << "Number of threads missing!" << std::endl;
+	// }
 
-	int nThreads = atoi(argv[1]);
-	int xSize = atoi(argv[2]);
-	int ySize = atoi(argv[3]);
+	int xSize = atoi(argv[1]);
+	int ySize = atoi(argv[2]);
 
-	int debug = atoi(argv[4]);
+	int debug = atoi(argv[3]);
 
 
-	std::cout << "Number of threads: " << nThreads << endl;
+	//std::cout << "Number of threads: " << nThreads << endl;
 	int m = xSize;
 	int n = ySize;
 
@@ -186,6 +187,8 @@ int main(int argc, char** argv)
 	///*
 	//  Write data to an ASCII PPM file.
 	//*/
+	timestamp();
+
 	output.open(filename.c_str());
 
 	output << "P3\n";
