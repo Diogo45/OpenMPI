@@ -146,11 +146,14 @@ int main(int argc, char** argv)
 		extra = m%proc_n;
 		offset = 0;
 		mtype = FROM_MASTER;
-		for (dest=1; dest<=proc_n; dest++)
+		for (dest=1; dest < proc_n; dest++)
 		{
-			rows = (dest <= extra) ? averow+1 : averow;   	
-			printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
+			rows = (dest <= extra) ? averow+1 : averow;   
+
+			printf("Sending %d offset to task %d offset=%d\n",offset,dest,offset);
 			MPI_Send(&offset, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
+			printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
+
 			MPI_Send(&rows, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 			offset = offset + rows;
@@ -160,7 +163,7 @@ int main(int argc, char** argv)
 		//RECV RECV RECV
 
 		 mtype = FROM_WORKER;
-		for (i=1; i< proc_n; i++)
+		for (i=1; i < proc_n; i++)
 		{
 			source = i;
 			MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
