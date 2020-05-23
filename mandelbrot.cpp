@@ -228,14 +228,14 @@ int main(int argc, char** argv)
 		MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 		MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
-		printf("Task %d receiveing %d rows and %d offset=%d\n",taskid,rows,dest,offset);
+		printf("Task %d receiveing %d rows and %d offset=%d\n",my_rank,rows,dest,offset);
 
 
 
 		for (i = offset; i < offset + rows; i++)
 		{
 
-			printf("Task %d starting processing line %d\n",taskid,i);
+			printf("Task %d starting processing line %d\n",my_rank,i);
 
 			/*if (debug == 1)
 			{
@@ -290,7 +290,7 @@ int main(int argc, char** argv)
 		}
 
 		//SEND
-		printf("Task %d Sending Back results\n",taskid);
+		printf("Task %d Sending Back results\n",my_rank);
 
 
 		MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
