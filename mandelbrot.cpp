@@ -235,7 +235,7 @@ int main(int argc, char** argv)
 		for (i = offset; i < offset + rows; i++)
 		{
 
-			printf("Task %d starting processing line %d\n",my_rank,i);
+			//printf("Task %d starting processing line %d\n",my_rank,i);
 
 			/*if (debug == 1)
 			{
@@ -290,14 +290,16 @@ int main(int argc, char** argv)
 		}
 
 		//SEND
-		printf("Task %d Sending Back results\n",my_rank);
+		
 
 
 		MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 		MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&r[offset][0], rows*n, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&g[offset][0], rows*n, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&b[offset][0], rows*n, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&r[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+
+		printf("Task %d Sending Back results\n",my_rank);
 
 		
 	}
