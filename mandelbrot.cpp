@@ -142,8 +142,8 @@ int main(int argc, char** argv)
 		double start = MPI_Wtime();
 
 		/* Send matrix data to the worker tasks */
-		averow = m/proc_n;
-		extra = m%proc_n;
+		averow = m/(proc_n-1);
+		extra = m%(proc_n-1);
 		offset = 0;
 		mtype = FROM_MASTER;
 		for (dest=1; dest < proc_n; dest++)
