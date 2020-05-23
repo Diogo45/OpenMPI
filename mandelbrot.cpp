@@ -96,7 +96,12 @@ int main(int argc, char** argv)
 
 	int offset, rows; 
 	int my_rank;       // Identificador deste processo
+
+	int mtype, dest, extra, averow, source;
 	int proc_n; 
+
+	MPI_Status status;
+
 
 	MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
@@ -155,7 +160,7 @@ int main(int argc, char** argv)
 		//RECV RECV RECV
 
 		 mtype = FROM_WORKER;
-		for (i=1; i<=numworkers; i++)
+		for (i=1; i<=proc_n; i++)
 		{
 			source = i;
 			MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
