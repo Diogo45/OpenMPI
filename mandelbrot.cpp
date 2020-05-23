@@ -253,10 +253,10 @@ int main(int argc, char** argv)
 			{
 
 
-				// if(i == offset + rows - 1 && j >= 430 && j <= 438)
-				// {
-				// 	printf("1. TASK %d DOING SHIT IN J=%d\n", my_rank, j);
-				// }
+				if(i == offset + rows - 1 && j >= 430 && j <= 438)
+				{
+					printf("1. TASK %d DOING SHIT IN J=%d\n", my_rank, j);
+				}
 
 				x = ((double)(j - 1) * x_max
 					+ (double)(m - j) * x_min)
@@ -304,7 +304,7 @@ int main(int argc, char** argv)
 
 				if(i == offset + rows - 1 && j >= 430 && j <= 438)
 				{
-					printf("1. TASK %d r=%d g=%d b=%d \n", my_rank, r[i][j], g[i][j], b[i][j]);
+					printf("2. TASK %d r=%d g=%d b=%d \n", my_rank, r[i][j], g[i][j], b[i][j]);
 				}
 				
 
