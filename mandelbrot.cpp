@@ -7,6 +7,12 @@
 # include <cstring>
 #include "mpi.h"
 
+#define MASTER 0               /* taskid of first task */
+#define FROM_MASTER 1          /* setting a message type */
+#define FROM_WORKER 2          /* setting a message type */
+#define TAREFAS 7; // Numero de tarefas no saco de trabalho para np = 8, processo 0 é o mestre
+
+
 
 using namespace std;
 int main(int argc, char** argv);
@@ -53,15 +59,15 @@ int main(int argc, char** argv)
 	// 	std::cout << "Number of threads missing!" << std::endl;
 	// }
 
-	int xSize = atoi(argv[1]);
-	int ySize = atoi(argv[2]);
+	// int xSize = atoi(argv[1]);
+	// int ySize = atoi(argv[2]);
 
-	int debug = atoi(argv[3]);
+	// int debug = atoi(argv[3]);
 
 
 	//std::cout << "Number of threads: " << nThreads << endl;
-	int m = xSize;
-	int n = ySize;
+	int m = 1000;
+	int n = 1000;
 
 	int** b;
 	int c;
@@ -88,30 +94,198 @@ int main(int argc, char** argv)
 	double y1;
 	double y2;
 
+	int offset, rows; 
+	int my_rank;       // Identificador deste processo
+	int proc_n; 
+
+	MPI_Init(&argc,&argv);
+	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
+
 	b = i4pp_new(m, n);
 	count = i4pp_new(m, n);
 	g = i4pp_new(m, n);
 	r = i4pp_new(m, n);
 
-	timestamp();
-	std::cout << "\n";
-	std::cout << "MANDELBROT_OPENMPI\n";
-	std::cout << "  C++/OpenMP version\n";
-	std::cout << "\n";
-	std::cout << "  Create an ASCII PPM image of the Mandelbrot set.\n";
-	std::cout << "\n";
-	std::cout << "  For each point C = X + i*Y\n";
-	std::cout << "  with X range [" << x_min << "," << x_max << "]\n";
-	std::cout << "  and  Y range [" << y_min << "," << y_max << "]\n";
-	std::cout << "  carry out " << count_max << " iterations of the map\n";
-	std::cout << "  Z(n+1) = Z(n)^2 + C.\n";
-	std::cout << "  If the iterates stay bounded (norm less than 2)\n";
-	std::cout << "  then C is taken to be a member of the set.\n";
-	std::cout << "\n";
-	std::cout << "  An ASCII PPM image of the set is created using\n";
-	std::cout << "    M = " << m << " pixels in the X direction and\n";
-	std::cout << "    N = " << n << " pixels in the Y direction.\n";
+	if(my_rank == MASTER)
+	{
+		timestamp();
+		std::cout << "\n";
+		std::cout << "MANDELBROT_OPENMPI\n";
+		std::cout << "  C++/OpenMP version\n";
+		std::cout << "\n";
+		std::cout << "  Create an ASCII PPM image of the Mandelbrot set.\n";
+		std::cout << "\n";
+		std::cout << "  For each point C = X + i*Y\n";
+		std::cout << "  with X range [" << x_min << "," << x_max << "]\n";
+		std::cout << "  and  Y range [" << y_min << "," << y_max << "]\n";
+		std::cout << "  carry out " << count_max << " iterations of the map\n";
+		std::cout << "  Z(n+1) = Z(n)^2 + C.\n";
+		std::cout << "  If the iterates stay bounded (norm less than 2)\n";
+		std::cout << "  then C is taken to be a member of the set.\n";
+		std::cout << "\n";
+		std::cout << "  An ASCII PPM image of the set is created using\n";
+		std::cout << "    M = " << m << " pixels in the X direction and\n";
+		std::cout << "    N = " << n << " pixels in the Y direction.\n";
 
+
+
+
+		//SEND SEND SEND
+
+		/* Measure start time */
+		double start = MPI_Wtime();
+
+		/* Send matrix data to the worker tasks */
+		averow = m/proc_n;
+		extra = m%proc_n;
+		offset = 0;
+		mtype = FROM_MASTER;
+		for (dest=1; dest<=proc_n; dest++)
+		{
+			rows = (dest <= extra) ? averow+1 : averow;   	
+			printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
+			MPI_Send(&offset, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
+			MPI_Send(&rows, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
+
+			offset = offset + rows;
+		}
+
+
+		//RECV RECV RECV
+
+		 mtype = FROM_WORKER;
+		for (i=1; i<=numworkers; i++)
+		{
+			source = i;
+			MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+			MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+			MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, 
+					MPI_COMM_WORLD, &status);
+			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, 
+					MPI_COMM_WORLD, &status);
+			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, 
+					MPI_COMM_WORLD, &status);
+			// printf("Received results from task %d\n",source);
+		}
+
+
+		timestamp();
+
+		output.open(filename.c_str());
+
+		output << "P3\n";
+		output << n << "  " << m << "\n";
+		output << 255 << "\n";
+		for (i = 0; i < m; i++)
+		{
+			for (jlo = 0; jlo < n; jlo = jlo + 4)
+			{
+				jhi = i4_min(jlo + 4, n);
+				for (j = jlo; j < jhi; j++)
+				{
+					output << "  " << r[i][j]
+						<< "  " << g[i][j]
+						<< "  " << b[i][j] << "\n";
+				}
+				output << "\n";
+			}
+		}
+
+		output.close();
+		std::cout << "\n";
+		std::cout << "  Graphics data written to \"" << filename << "\".\n";
+		/*
+		Free memory.
+		*/
+		i4pp_delete(b, m, n);
+		i4pp_delete(count, m, n);
+		i4pp_delete(g, m, n);
+		i4pp_delete(r, m, n);
+		/*
+		Terminate.
+		*/
+		std::cout << "\n";
+		std::cout << "MANDELBROT_OPENMP\n";
+		std::cout << "  Normal end of execution.\n";
+		std::cout << "\n";
+		timestamp();
+
+
+	}
+	else
+	{
+
+		//RECV
+		mtype = FROM_MASTER;
+		MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
+		MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
+
+		for (i = offset; i < offset + rows; i++)
+		{
+			/*if (debug == 1)
+			{
+				int tid = omp_get_thread_num();
+				printf("Hello %d\n", tid);
+			}*/
+
+			for (j = 0; j < n; j++)
+			{
+				x = ((double)(j - 1) * x_max
+					+ (double)(m - j) * x_min)
+					/ (double)(m - 1);
+
+				y = ((double)(i - 1) * y_max
+					+ (double)(n - i) * y_min)
+					/ (double)(n - 1);
+
+				count[i][j] = 0;
+
+				x1 = x;
+				y1 = y;
+
+				for (k = 1; k <= count_max; k++)
+				{
+					x2 = x1 * x1 - y1 * y1 + x;
+					y2 = 2 * x1 * y1 + y;
+
+					if (x2 < -2 || 2 < x2 || y2 < -1 || 1 < y2)
+					{
+						count[i][j] = k;
+						break;
+					}
+					x1 = x2;
+					y1 = y2;
+				}
+
+				if ((count[i][j] % 2) == 1)
+				{
+					r[i][j] = 255;
+					g[i][j] = 255;
+					b[i][j] = 255;
+				}
+				else
+				{
+					c = (int)(255.0 * sqrt(sqrt(sqrt(
+						((double)(count[i][j]) / (double)(count_max))))));
+					r[i][j] = 3 * c / 5;
+					g[i][j] = 3 * c / 5;
+					b[i][j] = c;
+				}
+			}
+		}
+
+		//SEND
+		MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&r[offset][0], rows*n, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&g[offset][0], rows*n, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&b[offset][0], rows*n, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
+
+		
+	}
+
+	
 	//	wtime = omp_get_wtime();
 	//	/*
 	//	  Carry out the iteration for each pixel, determining COUNT.
@@ -125,60 +299,12 @@ int main(int argc, char** argv)
 	//	{
 	//# pragma omp for schedule(dynamic)
 
+	//RECV(offset)
+	//RECV(nRows)
 
-	for (i = 0; i < m; i++)
-	{
-		/*if (debug == 1)
-		{
-			int tid = omp_get_thread_num();
-			printf("Hello %d\n", tid);
-		}*/
 
-		for (j = 0; j < n; j++)
-		{
-			x = ((double)(j - 1) * x_max
-				+ (double)(m - j) * x_min)
-				/ (double)(m - 1);
 
-			y = ((double)(i - 1) * y_max
-				+ (double)(n - i) * y_min)
-				/ (double)(n - 1);
-
-			count[i][j] = 0;
-
-			x1 = x;
-			y1 = y;
-
-			for (k = 1; k <= count_max; k++)
-			{
-				x2 = x1 * x1 - y1 * y1 + x;
-				y2 = 2 * x1 * y1 + y;
-
-				if (x2 < -2 || 2 < x2 || y2 < -1 || 1 < y2)
-				{
-					count[i][j] = k;
-					break;
-				}
-				x1 = x2;
-				y1 = y2;
-			}
-
-			if ((count[i][j] % 2) == 1)
-			{
-				r[i][j] = 255;
-				g[i][j] = 255;
-				b[i][j] = 255;
-			}
-			else
-			{
-				c = (int)(255.0 * sqrt(sqrt(sqrt(
-					((double)(count[i][j]) / (double)(count_max))))));
-				r[i][j] = 3 * c / 5;
-				g[i][j] = 3 * c / 5;
-				b[i][j] = c;
-			}
-		}
-	}
+	
 //}
 
 	//wtime = omp_get_wtime() - wtime;
@@ -187,46 +313,6 @@ int main(int argc, char** argv)
 	///*
 	//  Write data to an ASCII PPM file.
 	//*/
-	timestamp();
-
-	output.open(filename.c_str());
-
-	output << "P3\n";
-	output << n << "  " << m << "\n";
-	output << 255 << "\n";
-	for (i = 0; i < m; i++)
-	{
-		for (jlo = 0; jlo < n; jlo = jlo + 4)
-		{
-			jhi = i4_min(jlo + 4, n);
-			for (j = jlo; j < jhi; j++)
-			{
-				output << "  " << r[i][j]
-					<< "  " << g[i][j]
-					<< "  " << b[i][j] << "\n";
-			}
-			output << "\n";
-		}
-	}
-
-	output.close();
-	std::cout << "\n";
-	std::cout << "  Graphics data written to \"" << filename << "\".\n";
-	/*
-	  Free memory.
-	*/
-	i4pp_delete(b, m, n);
-	i4pp_delete(count, m, n);
-	i4pp_delete(g, m, n);
-	i4pp_delete(r, m, n);
-	/*
-	  Terminate.
-	*/
-	std::cout << "\n";
-	std::cout << "MANDELBROT_OPENMP\n";
-	std::cout << "  Normal end of execution.\n";
-	std::cout << "\n";
-	timestamp();
 
 	return 0;
 }
