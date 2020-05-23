@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 
 		//RECV RECV RECV
 
-		 mtype = FROM_WORKER;
+		mtype = FROM_WORKER;
 		for (i=1; i < proc_n; i++)
 		{
 			source = i;
@@ -297,6 +297,7 @@ int main(int argc, char** argv)
 
 		//SEND
 		
+		mtype = FROM_WORKER;
 
 
 		MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
