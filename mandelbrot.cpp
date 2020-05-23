@@ -174,11 +174,11 @@ int main(int argc, char** argv)
 			MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 
 			printf("Received offset and rows from task %d\n",source);
-			MPI_Recv(&r[offset][0], rows*n + 568, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+			MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 			printf("Received r from task %d\n",source);
-			MPI_Recv(&g[offset][0], rows*n + 568, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 			printf("Received g from task %d\n",source);
-			MPI_Recv(&b[offset][0], rows*n + 568, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 			printf("Received b from task %d\n",source);
 		}
 
@@ -259,8 +259,8 @@ int main(int argc, char** argv)
 				}
 
 				x = ((double)(j - 1) * x_max
-					+ (double)(m - j) * x_min)
-					/ (double)(m - 1);
+				+ (double)(m - j) * x_min)
+				/ (double)(m - 1);
 
 				y = ((double)(i - 1) * y_max
 					+ (double)(n - i) * y_min)
@@ -318,9 +318,9 @@ int main(int argc, char** argv)
 
 		MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 		MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&r[offset][0], rows*n + 568, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&g[offset][0], rows*n + 568, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&b[offset][0], rows*n + 568, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&r[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+		MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 
 		printf("Task %d Sending Back results\n",my_rank);
 
