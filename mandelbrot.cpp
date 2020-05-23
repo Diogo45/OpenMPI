@@ -150,7 +150,6 @@ int main(int argc, char** argv)
 		{
 			rows = (dest <= extra) ? averow+1 : averow;   
 
-			printf("Sending %d offset to task %d offset=%d\n",offset,dest,offset);
 			MPI_Send(&offset, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 			printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
 
@@ -174,7 +173,7 @@ int main(int argc, char** argv)
 					MPI_COMM_WORLD, &status);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, 
 					MPI_COMM_WORLD, &status);
-			// printf("Received results from task %d\n",source);
+			printf("Received results from task %d\n",source);
 		}
 
 
@@ -229,8 +228,15 @@ int main(int argc, char** argv)
 		MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 		MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
+		printf("Task %d receiveing %d rows and %d offset=%d\n",taskid,rows,dest,offset);
+
+
+
 		for (i = offset; i < offset + rows; i++)
 		{
+
+			printf("Task %d starting processing line %d\n",taskid,i);
+
 			/*if (debug == 1)
 			{
 				int tid = omp_get_thread_num();
@@ -284,6 +290,9 @@ int main(int argc, char** argv)
 		}
 
 		//SEND
+		printf("Task %d Sending Back results\n",taskid);
+
+
 		MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 		MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 		MPI_Send(&r[offset][0], rows*n, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
