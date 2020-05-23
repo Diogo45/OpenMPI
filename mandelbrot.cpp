@@ -339,8 +339,7 @@ int main(int argc, char** argv)
 	///*
 	//  Write data to an ASCII PPM file.
 	//*/
-
-	return 0;
+	MPI_Finalize();
 }
 //****************************************************************************80
 
