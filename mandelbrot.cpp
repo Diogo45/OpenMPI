@@ -160,7 +160,7 @@ int main(int argc, char** argv)
 		//RECV RECV RECV
 
 		 mtype = FROM_WORKER;
-		for (i=1; i<=proc_n; i++)
+		for (i=1; i< proc_n; i++)
 		{
 			source = i;
 			MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
