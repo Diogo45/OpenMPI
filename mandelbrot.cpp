@@ -234,7 +234,7 @@ int main(int argc, char** argv)
 		MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 		MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
-		printf("Task %d receiveing %d rows and %d offset=%d\n",my_rank,rows,dest,offset);
+		printf("Task %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
 
 
 
@@ -251,6 +251,13 @@ int main(int argc, char** argv)
 
 			for (j = 0; j < n; j++)
 			{
+
+
+				if(i == offset + rows - 1 && j >= 430 && j < 440)
+				{
+					printf("TASK %d DOING SHIT IN J=%d", my_rank, j);
+				}
+
 				x = ((double)(j - 1) * x_max
 					+ (double)(m - j) * x_min)
 					/ (double)(m - 1);
