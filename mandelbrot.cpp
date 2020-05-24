@@ -11,7 +11,8 @@
 #define FROM_MASTER 1          /* setting a message type */
 #define FROM_WORKER 2          /* setting a message type */
 #define TAREFAS 7; // Numero de tarefas no saco de trabalho para np = 8, processo 0 é o mestre
-
+#define LIVE = 0;
+#define KILL = 1;
 
 
 using namespace std;
@@ -79,6 +80,7 @@ int main(int argc, char** argv)
 	int jhi;
 	int jlo;
 	int k;
+	int kill_flag;
 	string filename = "mandelbrot.ppm";
 	ofstream output;
 	int** r;
@@ -144,7 +146,7 @@ int main(int argc, char** argv)
 		/* Send matrix data to the worker tasks */
 
 		int tasks = (proc_n - 1)*10;
-
+		kill_flag = LIVE;
 		averow = m/tasks;
 		extra = m%tasks;
 		int last_sched_offset = 0;
@@ -158,6 +160,8 @@ int main(int argc, char** argv)
 			//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
 
 			MPI_Send(&rows, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
+
+			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 			offset = offset + rows;
 			last_sched_offset = offset;
@@ -221,6 +225,7 @@ int main(int argc, char** argv)
 				printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,source,offset);
 
 				MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
+				MPI_Send(&kill_flag, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
 				last_sched_offset = last_sched_offset + rows;
 			}
@@ -280,100 +285,105 @@ int main(int argc, char** argv)
 
 		//RECV
 		mtype = FROM_MASTER;
-		MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
-		MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
-
-		printf("Task %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
-
-
-
-		for (i = offset; i < offset + rows; i++)
+		MPI_Recv(&kill_flag, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
+		
+		if(kill_flag == ALIVE)
 		{
 
-			//printf("Task %d starting processing line %d\n",my_rank,i);
+			MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
+			MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
-			/*if (debug == 1)
+			printf("Task %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
+
+
+
+			for (i = offset; i < offset + rows; i++)
 			{
-				int tid = omp_get_thread_num();
-				printf("Hello %d\n", tid);
-			}*/
 
-			for (j = 0; j < n; j++)
-			{
+				//printf("Task %d starting processing line %d\n",my_rank,i);
 
-
-				// if(i == offset + rows - 1 && j >= 430 && j <= 438)
-				// {
-				// 	printf("1. TASK %d DOING SHIT IN J=%d\n", my_rank, j);
-				// }
-
-				x = ((double)(j - 1) * x_max
-				+ (double)(m - j) * x_min)
-				/ (double)(m - 1);
-
-				y = ((double)(i - 1) * y_max
-					+ (double)(n - i) * y_min)
-					/ (double)(n - 1);
-
-
-				count[i][j] = 0;
-
-				x1 = x;
-				y1 = y;
-
-				for (k = 1; k <= count_max; k++)
+				/*if (debug == 1)
 				{
-					x2 = x1 * x1 - y1 * y1 + x;
-					y2 = 2 * x1 * y1 + y;
+					int tid = omp_get_thread_num();
+					printf("Hello %d\n", tid);
+				}*/
 
-					if (x2 < -2 || 2 < x2 || y2 < -1 || 1 < y2)
+				for (j = 0; j < n; j++)
+				{
+
+
+					// if(i == offset + rows - 1 && j >= 430 && j <= 438)
+					// {
+					// 	printf("1. TASK %d DOING SHIT IN J=%d\n", my_rank, j);
+					// }
+
+					x = ((double)(j - 1) * x_max
+					+ (double)(m - j) * x_min)
+					/ (double)(m - 1);
+
+					y = ((double)(i - 1) * y_max
+						+ (double)(n - i) * y_min)
+						/ (double)(n - 1);
+
+
+					count[i][j] = 0;
+
+					x1 = x;
+					y1 = y;
+
+					for (k = 1; k <= count_max; k++)
 					{
-						count[i][j] = k;
-						break;
+						x2 = x1 * x1 - y1 * y1 + x;
+						y2 = 2 * x1 * y1 + y;
+
+						if (x2 < -2 || 2 < x2 || y2 < -1 || 1 < y2)
+						{
+							count[i][j] = k;
+							break;
+						}
+						x1 = x2;
+						y1 = y2;
 					}
-					x1 = x2;
-					y1 = y2;
+
+					if ((count[i][j] % 2) == 1)
+					{
+						r[i][j] = 255;
+						g[i][j] = 255;
+						b[i][j] = 255;
+					}
+					else
+					{
+						c = (int)(255.0 * sqrt(sqrt(sqrt(
+							((double)(count[i][j]) / (double)(count_max))))));
+						r[i][j] = 3 * c / 5;
+						g[i][j] = 3 * c / 5;
+						b[i][j] = c;
+					}
+
+
+					// if(i == offset + rows - 1 && j >= 430 && j <= 438)
+					// {
+					// 	printf("2. TASK %d r=%d g=%d b=%d \n", my_rank, r[i][j], g[i][j], b[i][j]);
+					// }
+					
+
 				}
-
-				if ((count[i][j] % 2) == 1)
-				{
-					r[i][j] = 255;
-					g[i][j] = 255;
-					b[i][j] = 255;
-				}
-				else
-				{
-					c = (int)(255.0 * sqrt(sqrt(sqrt(
-						((double)(count[i][j]) / (double)(count_max))))));
-					r[i][j] = 3 * c / 5;
-					g[i][j] = 3 * c / 5;
-					b[i][j] = c;
-				}
-
-
-				// if(i == offset + rows - 1 && j >= 430 && j <= 438)
-				// {
-				// 	printf("2. TASK %d r=%d g=%d b=%d \n", my_rank, r[i][j], g[i][j], b[i][j]);
-				// }
-				
-
 			}
+
+			//SEND
+			
+			mtype = FROM_WORKER;
+
+
+			MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+			MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+			MPI_Send(&r[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+			MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+			MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
+
+			printf("Task %d Sending Back results\n",my_rank);
+
 		}
-
-		//SEND
-		
-		mtype = FROM_WORKER;
-
-
-		MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&r[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-		MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-
-		printf("Task %d Sending Back results\n",my_rank);
-
-		
 	}
 
 	
