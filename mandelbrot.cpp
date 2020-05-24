@@ -11,8 +11,8 @@
 #define FROM_MASTER 1          /* setting a message type */
 #define FROM_WORKER 2          /* setting a message type */
 #define TAREFAS 7; // Numero de tarefas no saco de trabalho para np = 8, processo 0 é o mestre
-#define LIVE = 0;
-#define KILL = 1;
+#define LIVE 0;
+#define KILL 1;
 
 
 using namespace std;
