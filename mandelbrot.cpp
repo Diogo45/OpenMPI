@@ -142,8 +142,12 @@ int main(int argc, char** argv)
 		double start = MPI_Wtime();
 
 		/* Send matrix data to the worker tasks */
-		averow = m/(proc_n-1);
-		extra = m%(proc_n-1);
+
+		int tasks = (proc_n - 1)*10;
+
+		averow = m/tasks;
+		extra = m%tasks;
+		int last_sched_offset = 0;
 		offset = 0;
 		mtype = FROM_MASTER;
 		for (dest=1; dest < proc_n; dest++)
@@ -151,35 +155,73 @@ int main(int argc, char** argv)
 			rows = (dest <= extra) ? averow+1 : averow;   
 
 			MPI_Send(&offset, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
-			printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
+			//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
 
 			MPI_Send(&rows, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 			offset = offset + rows;
+			last_sched_offset = offset;
 		}
 
 
 		//RECV RECV RECV
 
 		mtype = FROM_WORKER;
-		for (i=1; i < proc_n; i++)
+		// for (i=1; i < proc_n; i++)
+		// {
+		// 	source = i;
+		// 	//printf("Receiving results from task %d\n",source);
+
+
+		// 	MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+
+			
+		// 	MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+
+		// 	//printf("Received offset and rows from task %d\n",source);
+		// 	MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+		// 	//printf("Received r from task %d\n",source);
+		// 	MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+		// 	//printf("Received g from task %d\n",source);
+		// 	MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
+		// 	//printf("Received b from task %d\n",source);
+		// }
+
+
+		while(last_sched_offset < m)
 		{
-			source = i;
-			printf("Receiving results from task %d\n",source);
+			
+			mtype = FROM_WORKER;
 
-
-			MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-
+			MPI_Recv(&offset, 1, MPI_INT, MPI_ANY_SOURCE, mtype, MPI_COMM_WORLD, &status);
+			source = status.MPI_SOURCE;
+			//printf("Receiving results from task %d\n",source);
 			
 			MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 
-			printf("Received offset and rows from task %d\n",source);
+			//printf("Received offset and rows from task %d\n",source);
 			MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			printf("Received r from task %d\n",source);
+			//printf("Received r from task %d\n",source);
 			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			printf("Received g from task %d\n",source);
+			//printf("Received g from task %d\n",source);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			printf("Received b from task %d\n",source);
+			//printf("Received b from task %d\n",source);
+
+
+			mtype = FROM_MASTER;
+
+			rows = (dest <= extra) ? averow+1 : averow;   
+
+			MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
+			//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
+
+			MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
+
+			last_sched_offset = last_sched_offset + rows;
+
+
+
+
 		}
 
 
