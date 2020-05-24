@@ -188,6 +188,8 @@ int main(int argc, char** argv)
 		// }
 
 		int task_completed = 0;
+		printf("Started receiving results from task %d\n",source);
+
 		while(task_completed < tasks)
 		{
 			
@@ -195,17 +197,17 @@ int main(int argc, char** argv)
 
 			MPI_Recv(&offset, 1, MPI_INT, MPI_ANY_SOURCE, mtype, MPI_COMM_WORLD, &status);
 			source = status.MPI_SOURCE;
-			//printf("Receiving results from task %d\n",source);
+			printf("Receiving results from task %d\n",source);
 			
 			MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 
-			//printf("Received offset and rows from task %d\n",source);
+			printf("Received offset and rows from task %d\n",source);
 			MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			//printf("Received r from task %d\n",source);
+			printf("Received r from task %d\n",source);
 			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			//printf("Received g from task %d\n",source);
+			printf("Received g from task %d\n",source);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			//printf("Received b from task %d\n",source);
+			printf("Received b from task %d\n",source);
 
 			task_completed++;
 
@@ -216,7 +218,7 @@ int main(int argc, char** argv)
 				rows = (dest <= extra) ? averow+1 : averow;   
 
 				MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
-				//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
+				printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,dest,offset);
 
 				MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
@@ -300,10 +302,10 @@ int main(int argc, char** argv)
 			{
 
 
-				if(i == offset + rows - 1 && j >= 430 && j <= 438)
-				{
-					printf("1. TASK %d DOING SHIT IN J=%d\n", my_rank, j);
-				}
+				// if(i == offset + rows - 1 && j >= 430 && j <= 438)
+				// {
+				// 	printf("1. TASK %d DOING SHIT IN J=%d\n", my_rank, j);
+				// }
 
 				x = ((double)(j - 1) * x_max
 				+ (double)(m - j) * x_min)
@@ -349,10 +351,10 @@ int main(int argc, char** argv)
 				}
 
 
-				if(i == offset + rows - 1 && j >= 430 && j <= 438)
-				{
-					printf("2. TASK %d r=%d g=%d b=%d \n", my_rank, r[i][j], g[i][j], b[i][j]);
-				}
+				// if(i == offset + rows - 1 && j >= 430 && j <= 438)
+				// {
+				// 	printf("2. TASK %d r=%d g=%d b=%d \n", my_rank, r[i][j], g[i][j], b[i][j]);
+				// }
 				
 
 			}
