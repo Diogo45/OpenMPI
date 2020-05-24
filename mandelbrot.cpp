@@ -187,8 +187,8 @@ int main(int argc, char** argv)
 		// 	//printf("Received b from task %d\n",source);
 		// }
 
-
-		while(last_sched_offset < m)
+		int task_completed = 0;
+		while(task_completed < tasks)
 		{
 			
 			mtype = FROM_WORKER;
@@ -207,17 +207,22 @@ int main(int argc, char** argv)
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 			//printf("Received b from task %d\n",source);
 
+			task_completed++;
 
-			mtype = FROM_MASTER;
+			if(last_sched_offset < m){
+				
+				mtype = FROM_MASTER;
 
-			rows = (dest <= extra) ? averow+1 : averow;   
+				rows = (dest <= extra) ? averow+1 : averow;   
 
-			MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
-			//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
+				MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
+				//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
 
-			MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
+				MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
-			last_sched_offset = last_sched_offset + rows;
+				last_sched_offset = last_sched_offset + rows;
+			}
+			
 
 
 
