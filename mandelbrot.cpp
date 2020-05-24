@@ -67,8 +67,8 @@ int main(int argc, char** argv)
 
 
 	//std::cout << "Number of threads: " << nThreads << endl;
-	int m = 2000;
-	int n = 2000;
+	int m = 16000;
+	int n = 16000;
 
 	int** b;
 	int c;
@@ -282,29 +282,29 @@ int main(int argc, char** argv)
 
 		timestamp();
 
-		output.open(filename.c_str());
+		// output.open(filename.c_str());
 
-		output << "P3\n";
-		output << n << "  " << m << "\n";
-		output << 255 << "\n";
-		for (i = 0; i < m; i++)
-		{
-			for (jlo = 0; jlo < n; jlo = jlo + 4)
-			{
-				jhi = i4_min(jlo + 4, n);
-				for (j = jlo; j < jhi; j++)
-				{
-					output << "  " << r[i][j]
-						<< "  " << g[i][j]
-						<< "  " << b[i][j] << "\n";
-				}
-				output << "\n";
-			}
-		}
+		// output << "P3\n";
+		// output << n << "  " << m << "\n";
+		// output << 255 << "\n";
+		// for (i = 0; i < m; i++)
+		// {
+		// 	for (jlo = 0; jlo < n; jlo = jlo + 4)
+		// 	{
+		// 		jhi = i4_min(jlo + 4, n);
+		// 		for (j = jlo; j < jhi; j++)
+		// 		{
+		// 			output << "  " << r[i][j]
+		// 				<< "  " << g[i][j]
+		// 				<< "  " << b[i][j] << "\n";
+		// 		}
+		// 		output << "\n";
+		// 	}
+		// }
 
-		output.close();
-		std::cout << "\n";
-		std::cout << "  Graphics data written to \"" << filename << "\".\n";
+		// output.close();
+		// std::cout << "\n";
+		// std::cout << "  Graphics data written to \"" << filename << "\".\n";
 		/*
 		Free memory.
 		*/
