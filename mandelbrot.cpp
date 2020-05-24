@@ -154,18 +154,18 @@ int main(int argc, char** argv)
 		offset = 0;
 		mtype = FROM_MASTER;
 
-		printf("tasks %d averows %d extra %d\n",tasks,averow,extra);
+		//printf("tasks %d averows %d extra %d\n",tasks,averow,extra);
 
 		for (dest=1; dest < proc_n; dest++)
 		{
 			rows = (dest <= extra) ? averow+1 : averow;   
+			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 			MPI_Send(&offset, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 			//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
 
 			MPI_Send(&rows, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
-			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 			offset = offset + rows;
 			last_sched_offset = offset;
@@ -224,12 +224,12 @@ int main(int argc, char** argv)
 				mtype = FROM_MASTER;
 
 				rows = (source <= extra) ? averow+1 : averow;   
+				MPI_Send(&kill_flag, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
 				MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 				printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,source,offset);
 
 				MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
-				MPI_Send(&kill_flag, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
 				last_sched_offset = last_sched_offset + rows;
 			}
