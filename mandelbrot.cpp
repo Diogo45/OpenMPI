@@ -158,7 +158,17 @@ int main(int argc, char** argv)
 
 		for (dest=1; dest < proc_n; dest++)
 		{
-			rows = (dest <= extra) ? averow+1 : averow;   
+			//rows = (dest <= extra) ? averow+1 : averow;
+			if(extra > 0)
+			{
+				rows = averow + 1;
+				extra--;
+			}
+			else
+			{
+				rows = averow;
+
+			}
 			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 			MPI_Send(&offset, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
@@ -223,7 +233,17 @@ int main(int argc, char** argv)
 				
 				mtype = FROM_MASTER;
 
-				rows = (source <= extra) ? averow+1 : averow;   
+				//rows = (source <= extra) ? averow+1 : averow;   
+				if(extra > 0)
+				{
+					rows = averow + 1;
+					extra--;
+				}
+				else
+				{
+					rows = averow;
+
+				}
 				MPI_Send(&kill_flag, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
 				MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
