@@ -283,17 +283,22 @@ int main(int argc, char** argv)
 	else
 	{
 
-		//RECV
-		mtype = FROM_MASTER;
-		MPI_Recv(&kill_flag, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
-		
-		if(kill_flag == ALIVE)
+		while(true)
 		{
+
+		
+			mtype = FROM_MASTER;
+			MPI_Recv(&kill_flag, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
+			
+			if(kill_flag == ALIVE)
+			{
+				break;
+			}
 
 			MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 			MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
-			printf("Task %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
+			printf("Worker %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
 
 
 
@@ -381,9 +386,13 @@ int main(int argc, char** argv)
 			MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 
-			printf("Task %d Sending Back results\n",my_rank);
+			printf("Worker %d Sending Back results\n",my_rank);
 
+			
 		}
+
+		printf("Worker %d is done\n", my_rank);
+
 	}
 
 	
