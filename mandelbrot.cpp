@@ -146,12 +146,16 @@ int main(int argc, char** argv)
 		/* Send matrix data to the worker tasks */
 
 		int tasks = (proc_n - 1)*10;
+
 		kill_flag = LIVE;
 		averow = m/tasks;
 		extra = m%tasks;
 		int last_sched_offset = 0;
 		offset = 0;
 		mtype = FROM_MASTER;
+
+		printf("tasks %d averows %d extra %d\n",tasks,averow,extra);
+
 		for (dest=1; dest < proc_n; dest++)
 		{
 			rows = (dest <= extra) ? averow+1 : averow;   
