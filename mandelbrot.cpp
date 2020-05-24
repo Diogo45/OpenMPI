@@ -10,9 +10,9 @@
 #define MASTER 0               /* taskid of first task */
 #define FROM_MASTER 1          /* setting a message type */
 #define FROM_WORKER 2          /* setting a message type */
-#define TAREFAS 7; // Numero de tarefas no saco de trabalho para np = 8, processo 0 é o mestre
-#define LIVE 0;
-#define KILL 1;
+#define TAREFAS 7 // Numero de tarefas no saco de trabalho para np = 8, processo 0 é o mestre
+#define LIVE 0
+#define KILL 1
 
 
 using namespace std;
@@ -302,7 +302,7 @@ int main(int argc, char** argv)
 			mtype = FROM_MASTER;
 			MPI_Recv(&kill_flag, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 			
-			if(kill_flag == LIVE)
+			if(kill_flag == KILL)
 			{
 				break;
 			}
