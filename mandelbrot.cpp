@@ -188,7 +188,7 @@ int main(int argc, char** argv)
 		// }
 
 		int task_completed = 0;
-		printf("Started receiving results from task %d\n",source);
+		printf("Started receiving results");
 
 		while(task_completed < tasks)
 		{
@@ -215,22 +215,22 @@ int main(int argc, char** argv)
 				
 				mtype = FROM_MASTER;
 
-				rows = (dest <= extra) ? averow+1 : averow;   
+				rows = (source <= extra) ? averow+1 : averow;   
 
 				MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
-				printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,dest,offset);
+				printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,source,offset);
 
 				MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
 				last_sched_offset = last_sched_offset + rows;
 			}
 			
-
-
+		
 
 
 		}
 
+		printf("Finished receiving results");
 
 		timestamp();
 
