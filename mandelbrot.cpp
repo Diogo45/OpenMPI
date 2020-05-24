@@ -67,8 +67,8 @@ int main(int argc, char** argv)
 
 
 	//std::cout << "Number of threads: " << nThreads << endl;
-	int m = 10000;
-	int n = 10000;
+	int m = 2000;
+	int n = 2000;
 
 	int** b;
 	int c;
