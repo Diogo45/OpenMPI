@@ -235,6 +235,18 @@ int main(int argc, char** argv)
 
 		}
 
+		kill_flag = KILL;
+
+		for (dest=1; dest < proc_n; dest++)
+		{
+		
+			printf("Killing worker %d \n",dest);
+
+			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
+
+		}
+
+
 		printf("Finished receiving results");
 
 		timestamp();
@@ -290,7 +302,7 @@ int main(int argc, char** argv)
 			mtype = FROM_MASTER;
 			MPI_Recv(&kill_flag, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 			
-			if(kill_flag == ALIVE)
+			if(kill_flag == LIVE)
 			{
 				break;
 			}
