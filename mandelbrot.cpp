@@ -117,6 +117,11 @@ int main(int argc, char** argv)
 	if(my_rank == MASTER)
 	{
 		timestamp();
+
+		double t1,t2;
+		t1 = MPI_Wtime();  // inicia a contagem do tempo
+
+
 		std::cout << "\n";
 		std::cout << "MANDELBROT_OPENMPI\n";
 		std::cout << "  C++/OpenMP version\n";
@@ -215,17 +220,17 @@ int main(int argc, char** argv)
 
 			MPI_Recv(&offset, 1, MPI_INT, MPI_ANY_SOURCE, mtype, MPI_COMM_WORLD, &status);
 			source = status.MPI_SOURCE;
-			printf("Receiving results from task %d\n",source);
+			//printf("Receiving results from task %d\n",source);
 			
 			MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 
-			printf("Received offset and rows from task %d\n",source);
+			//printf("Received offset and rows from task %d\n",source);
 			MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			printf("Received r from task %d\n",source);
+			//printf("Received r from task %d\n",source);
 			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			printf("Received g from task %d\n",source);
+			//printf("Received g from task %d\n",source);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			printf("Received b from task %d\n",source);
+			//("Received b from task %d\n",source);
 
 			task_completed++;
 
@@ -247,7 +252,7 @@ int main(int argc, char** argv)
 				MPI_Send(&kill_flag, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
 				MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
-				printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,source,offset);
+				//printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,source,offset);
 
 				MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
@@ -264,14 +269,16 @@ int main(int argc, char** argv)
 		for (dest=1; dest < proc_n; dest++)
 		{
 		
-			printf("Killing worker %d \n",dest);
+			//printf("Killing worker %d \n",dest);
 
 			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 		}
 
+		t2 = MPI_Wtime(); // termina a contagem do tempo
+ 		printf("\nTempo de execucao: %f\n\n", t2-t1);   
 
-		printf("Finished receiving results");
+		//printf("Finished receiving results");
 
 		timestamp();
 
@@ -334,7 +341,7 @@ int main(int argc, char** argv)
 			MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 			MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
-			printf("Worker %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
+			//printf("Worker %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
 
 
 
@@ -422,12 +429,12 @@ int main(int argc, char** argv)
 			MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 
-			printf("Worker %d Sending Back results\n",my_rank);
+			//printf("Worker %d Sending Back results\n",my_rank);
 
 			
 		}
 
-		printf("Worker %d is done\n", my_rank);
+		//printf("Worker %d is done\n", my_rank);
 
 	}
 
@@ -460,6 +467,9 @@ int main(int argc, char** argv)
 	//  Write data to an ASCII PPM file.
 	//*/
 	MPI_Finalize();
+
+
+	return 0;
 }
 //****************************************************************************80
 
