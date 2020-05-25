@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 
 		/* Send matrix data to the worker tasks */
 
-		int tasks = (proc_n - 1)*10;
+		int tasks = (proc_n - 1);
 
 		kill_flag = LIVE;
 		averow = m/tasks;
