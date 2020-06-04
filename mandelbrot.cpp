@@ -56,19 +56,8 @@ int main(int argc, char** argv)
 //
 {
 
-	// if (argc < 2) {
-	// 	std::cout << "Number of threads missing!" << std::endl;
-	// }
-
-	// int xSize = atoi(argv[1]);
-	// int ySize = atoi(argv[2]);
-
-	// int debug = atoi(argv[3]);
-
-
-	//std::cout << "Number of threads: " << nThreads << endl;
-	int m = 16000;
-	int n = 16000;
+	int m = 16000; //tamanho da imagem em linhas
+	int n = 16000; //tamanho da imagem em colunas
 
 	int** b;
 	int c;
@@ -96,7 +85,8 @@ int main(int argc, char** argv)
 	double y1;
 	double y2;
 
-	int offset, rows; 
+	int offset, rows;  //Variaveis para controle de em qual linha comeca o processamento 
+						//	e quantas linhas a partir desta serão processadas por essa thread
 	int my_rank;       // Identificador deste processo
 
 	int mtype, dest, extra, averow, source;
@@ -150,20 +140,22 @@ int main(int argc, char** argv)
 
 		/* Send matrix data to the worker tasks */
 
-		int tasks = (proc_n - 1) * 100;
+		int tasks = (proc_n - 1) * 10; //numero de tasks, baseado na quantidade de workers (proc_n-1)
 
-		kill_flag = LIVE;
-		averow = m/tasks;
-		extra = m%tasks;
+		kill_flag = LIVE; //flag enviada para matar os workers
+		averow = m/tasks; //média de linhas por número de tasjs a seren criadas
+		extra = m%tasks; //resto devido a divisao
 		int last_sched_offset = 0;
-		offset = 0;
+		offset = 0;//posição atual no saco de trabalho
+		
 		mtype = FROM_MASTER;
 
-		//printf("tasks %d averows %d extra %d\n",tasks,averow,extra);
 
+		// Primeiramente enviamos estaticamente os pacotes de trabalho iniciais
+		// Eh suficiente mandar a linha inicial, ou offset, e o numero linhas 
+		// a serem processadas, ou rows, para cada thread worker para que aconteca o processamento
 		for (dest=1; dest < proc_n; dest++)
 		{
-			//rows = (dest <= extra) ? averow+1 : averow;
 			if(extra > 0)
 			{
 				rows = averow + 1;
@@ -177,7 +169,6 @@ int main(int argc, char** argv)
 			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 			MPI_Send(&offset, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
-			//printf("Sending %d rows to task %d offset=%d\n",rows,dest,offset);
 
 			MPI_Send(&rows, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
@@ -187,28 +178,13 @@ int main(int argc, char** argv)
 		}
 
 
-		//RECV RECV RECV
+		//O proximo passo eh esperar os primeiros workers terminarem o processamento, para
+		// que possamos envia-los novos pacotes de trabalho dinamicamente. Isso se repete
+		// ate a imagem inteira ter sido escalonada, ou seja, (last_sched_offset >= m).
+		// E recebemos dos workers os pacotes processados ate que nao existam mais tasks, isto eh,
+		// (task_completed >= tasks)
 
 		mtype = FROM_WORKER;
-		// for (i=1; i < proc_n; i++)
-		// {
-		// 	source = i;
-		// 	//printf("Receiving results from task %d\n",source);
-
-
-		// 	MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-
-			
-		// 	MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-
-		// 	//printf("Received offset and rows from task %d\n",source);
-		// 	MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-		// 	//printf("Received r from task %d\n",source);
-		// 	MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-		// 	//printf("Received g from task %d\n",source);
-		// 	MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-		// 	//printf("Received b from task %d\n",source);
-		// }
 
 		int task_completed = 0;
 		printf("Started receiving results");
@@ -218,19 +194,16 @@ int main(int argc, char** argv)
 			
 			mtype = FROM_WORKER;
 
+			//Para que nao fiquemos presos esperadando um worker com id especifico, inicialmente
+			// aceitamos mensagens de  MPI_ANY_SOURCE, ou seja, de qualquer id, desde que o tipo de
+			// mensagem seja FROM_WORKER
 			MPI_Recv(&offset, 1, MPI_INT, MPI_ANY_SOURCE, mtype, MPI_COMM_WORLD, &status);
 			source = status.MPI_SOURCE;
-			//printf("Receiving results from task %d\n",source);
-			
+			// Agora recebemos o resto das informacoes do mesmo id assinalado a source
 			MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-
-			//printf("Received offset and rows from task %d\n",source);
 			MPI_Recv(&r[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			//printf("Received r from task %d\n",source);
 			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			//printf("Received g from task %d\n",source);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-			//("Received b from task %d\n",source);
 
 			task_completed++;
 
@@ -238,7 +211,7 @@ int main(int argc, char** argv)
 				
 				mtype = FROM_MASTER;
 
-				//rows = (source <= extra) ? averow+1 : averow;   
+				//distribui linhas do resto se necessário
 				if(extra > 0)
 				{
 					rows = averow + 1;
@@ -249,10 +222,11 @@ int main(int argc, char** argv)
 					rows = averow;
 
 				}
+
+				//envia novas informações para o worker qual enviou os dados
 				MPI_Send(&kill_flag, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
 				MPI_Send(&last_sched_offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
-				//printf("Sending Dynamic %d rows to task %d offset=%d\n",rows,source,offset);
 
 				MPI_Send(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD);
 
@@ -265,12 +239,10 @@ int main(int argc, char** argv)
 		}
 
 		kill_flag = KILL;
-
+		//Por final informamos aos workers que nao ha mais trabalho a ser feito pelo sinal de kill
 		for (dest=1; dest < proc_n; dest++)
 		{
 		
-			//printf("Killing worker %d \n",dest);
-
 			MPI_Send(&kill_flag, 1, MPI_INT, dest, mtype, MPI_COMM_WORLD);
 
 		}
@@ -278,33 +250,34 @@ int main(int argc, char** argv)
 		t2 = MPI_Wtime(); // termina a contagem do tempo
  		printf("\nTempo de execucao: %f\n\n", t2-t1);   
 
-		//printf("Finished receiving results");
 
-		timestamp();
+		///*
+		//  Write data to an ASCII PPM file.
+		//*/
+		output.open(filename.c_str());
 
-		// output.open(filename.c_str());
+		output << "P3\n";
+		output << n << "  " << m << "\n";
+		output << 255 << "\n";
+		for (i = 0; i < m; i++)
+		{
+			for (jlo = 0; jlo < n; jlo = jlo + 4)
+			{
+				jhi = i4_min(jlo + 4, n);
+				for (j = jlo; j < jhi; j++)
+				{
+					output << "  " << r[i][j]
+						<< "  " << g[i][j]
+						<< "  " << b[i][j] << "\n";
+				}
+				output << "\n";
+			}
+		}
 
-		// output << "P3\n";
-		// output << n << "  " << m << "\n";
-		// output << 255 << "\n";
-		// for (i = 0; i < m; i++)
-		// {
-		// 	for (jlo = 0; jlo < n; jlo = jlo + 4)
-		// 	{
-		// 		jhi = i4_min(jlo + 4, n);
-		// 		for (j = jlo; j < jhi; j++)
-		// 		{
-		// 			output << "  " << r[i][j]
-		// 				<< "  " << g[i][j]
-		// 				<< "  " << b[i][j] << "\n";
-		// 		}
-		// 		output << "\n";
-		// 	}
-		// }
+		output.close();
+		std::cout << "\n";
+		std::cout << "  Graphics data written to \"" << filename << "\".\n";
 
-		// output.close();
-		// std::cout << "\n";
-		// std::cout << "  Graphics data written to \"" << filename << "\".\n";
 		/*
 		Free memory.
 		*/
@@ -331,39 +304,27 @@ int main(int argc, char** argv)
 
 		
 			mtype = FROM_MASTER;
+			//recebe a flag que informa se o worker deve finalizar ou continuar
 			MPI_Recv(&kill_flag, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 			
 			if(kill_flag == KILL)
 			{
 				break;
 			}
-
+			//recebe valores do mestre para o trabalho
+			
 			MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 			MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
-
-			//printf("Worker %d receiveing %d rows and offset=%d\n",my_rank,rows,offset);
 
 
 
 			for (i = offset; i < offset + rows; i++)
 			{
 
-				//printf("Task %d starting processing line %d\n",my_rank,i);
-
-				/*if (debug == 1)
-				{
-					int tid = omp_get_thread_num();
-					printf("Hello %d\n", tid);
-				}*/
 
 				for (j = 0; j < n; j++)
 				{
 
-
-					// if(i == offset + rows - 1 && j >= 430 && j <= 438)
-					// {
-					// 	printf("1. TASK %d DOING SHIT IN J=%d\n", my_rank, j);
-					// }
 
 					x = ((double)(j - 1) * x_max
 					+ (double)(m - j) * x_min)
@@ -409,63 +370,32 @@ int main(int argc, char** argv)
 					}
 
 
-					// if(i == offset + rows - 1 && j >= 430 && j <= 438)
-					// {
-					// 	printf("2. TASK %d r=%d g=%d b=%d \n", my_rank, r[i][j], g[i][j], b[i][j]);
-					// }
-					
+				
 
 				}
 			}
 
 			//SEND
 			
+
+			
 			mtype = FROM_WORKER;
 
-
+			//envia os dados para o mestre incluindo informações RGB calculadas e OFFSET e ROWS para a área da imagem calculada
 			MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&r[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 
-			//printf("Worker %d Sending Back results\n",my_rank);
 
 			
 		}
 
-		//printf("Worker %d is done\n", my_rank);
 
 	}
 
 	
-	//	wtime = omp_get_wtime();
-	//	/*
-	//	  Carry out the iteration for each pixel, determining COUNT.
-	//	*/
-	//
-	//	omp_set_num_threads(nThreads);
-	//
-	//# pragma omp parallel \
-	//  shared ( b, count, count_max, g, r, x_max, x_min, y_max, y_min ) \
-	//  private ( i, j, k, x, x1, x2, y, y1, y2 )
-	//	{
-	//# pragma omp for schedule(dynamic)
-
-	//RECV(offset)
-	//RECV(nRows)
-
-
-
-	
-//}
-
-	//wtime = omp_get_wtime() - wtime;
-	//std::cout << "\n";
-	//std::cout << "  Time = " << wtime << " seconds.\n";
-	///*
-	//  Write data to an ASCII PPM file.
-	//*/
 	MPI_Finalize();
 
 
