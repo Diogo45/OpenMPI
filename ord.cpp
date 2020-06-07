@@ -27,6 +27,7 @@ int main(int argc, char** argv)
 
     int size = VEC_SIZE; 
 
+    unsigned long seed = 1;
 
     double t1,t2;
 	MPI_Status status;
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
 
 		/* Send matrix data to the worker tasks */
 		
-        RandomNumberGenerator rnd = new RandomNumberGenerator(1);
+        RandomNumberGenerator rnd = new RandomNumberGenerator(seed);
 
         //CRIA VETOR RANDOM
         for(int i = 0; i < VEC_SIZE; i++)
