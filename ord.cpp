@@ -13,7 +13,7 @@
 #define LIVE 0
 #define KILL 1
 
-#define VEC_SIZE 1000000
+#define VEC_SIZE 100
 
 
 int main(int argc, char** argv)
@@ -35,10 +35,10 @@ int main(int argc, char** argv)
 
     if(my_rank != MASTER)
 	{
-        MPI_Recv(&size, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
+        MPI_Recv(&size, 1, MPI_INT, MASTER, 1, MPI_COMM_WORLD, &status);
 
-        MPI_Recv(&vec, size, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
-        //MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
+        MPI_Recv(&vec[0], size, MPI_DOUBLE, MASTER, 1, MPI_COMM_WORLD, &status);
+        //MPI_Recv(&offset, 1, MPI_INT, MASTER, 1, MPI_COMM_WORLD, &status);
     }
     else
     {
@@ -51,8 +51,6 @@ int main(int argc, char** argv)
 
 		/* Send matrix data to the worker tasks */
 		
-		mtype = FROM_MASTER;
-
         RandomNumerGenerator rnd = new RandomNumerGenerator(1);
 
         //CRIA VETOR RANDOM
@@ -64,37 +62,47 @@ int main(int argc, char** argv)
         
 
 
-      
-
-        mtype = FROM_WORKER;
 
 		int task_completed = 0;
-		printf("Started receiving results");
+		//printf("Started receiving results");
 
 		
-		t2 = MPI_Wtime(); // termina a contagem do tempo
- 		printf("\nTempo de execucao: %f\n\n", t2-t1);   
+		
     }
 
 
     if(size <= VEC_SIZE/proc_n)
     {
-        sort(tamanho, offset)
+        sort(&vec[0], size);
+
+        MPI_Send(&vec[0], size, MPI_DOUBLE, (my_rank - 1) / 2 , 1, MPI_COMM_WORLD);
     }
     else
     {
         int newSize = size/2;
         int newSize2 = newSize + size%2;
         
-		MPI_Send(&newSize, 1, MPI_INT, my_rank * 2 + 1, mtype, MPI_COMM_WORLD);
-        MPI_Send(&vec[0], newSize, MPI_INT, my_rank + 1, mtype, MPI_COMM_WORLD);
+		MPI_Send(&newSize, 1, MPI_INT, my_rank * 2 + 1, 1, MPI_COMM_WORLD);
+        MPI_Send(&vec[0], newSize, MPI_DOUBLE, my_rank * 2 + 1, 1, MPI_COMM_WORLD);
 
-		MPI_Send(&newSize2, 1, MPI_INT, my_rank * 2 + 2, mtype, MPI_COMM_WORLD);
-        MPI_Send(&vec[newSize], newSize2, MPI_INT, my_rank + 2, mtype, MPI_COMM_WORLD);
+		MPI_Send(&newSize2, 1, MPI_INT, my_rank * 2 + 2, 1, MPI_COMM_WORLD);
+        MPI_Send(&vec[newSize], newSize2, MPI_DOUBLE, my_rank * 2 + 2, 1, MPI_COMM_WORLD);
      
 
-        MPI_Recv(&vec[0], newSize, MPI_INT, my_rank * 2 + 1, mtype, MPI_COMM_WORLD, &status);
-        MPI_Recv(&vec[newSize], newSize2, MPI_INT, my_rank * 2 + 2, mtype, MPI_COMM_WORLD, &status);
+        MPI_Recv(&vec[0], newSize, MPI_DOUBLE, my_rank * 2 + 1, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&vec[newSize], newSize2, MPI_DOUBLE, my_rank * 2 + 2, 1, MPI_COMM_WORLD, &status);
+
+        intercala(&vec[0], size);
+
+    }
+
+    if(my_rank == MASTER)
+    {
+        t2 = MPI_Wtime(); // termina a contagem do tempo
+        printf("\nTempo de execucao: %f\n\n", t2-t1);   
+
+
+        for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
 
 
     }
