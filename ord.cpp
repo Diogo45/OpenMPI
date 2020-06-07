@@ -15,6 +15,8 @@
 
 #define VEC_SIZE 100
 
+void sort(double* vetor,int size);
+void intercala(double* vet, int size);
 
 int main(int argc, char** argv)
 {
@@ -25,6 +27,8 @@ int main(int argc, char** argv)
 
     int size = VEC_SIZE; 
 
+
+    double t1,t2;
 	MPI_Status status;
 
 
@@ -44,32 +48,22 @@ int main(int argc, char** argv)
     }
     else
     {
-        timestamp();
 
-		double t1,t2;
+		
 		t1 = MPI_Wtime();  // inicia a contagem do tempo
 
         double start = MPI_Wtime();
 
 		/* Send matrix data to the worker tasks */
 		
-        RandomNumerGenerator rnd = new RandomNumerGenerator(1);
+        RandomNumberGenerator rnd = new RandomNumberGenerator(1);
 
         //CRIA VETOR RANDOM
-        for(int = 0; i < VEC_SIZE; i++)
+        for(int i = 0; i < VEC_SIZE; i++)
         {
             vec[i] = rnd.GetRandom(0.0, 1000000.0);
         }
 
-        
-
-
-
-		int task_completed = 0;
-		//printf("Started receiving results");
-
-		
-		
     }
 
 
@@ -138,12 +132,12 @@ void intercala(double* vet, int size)
     int j = size/2;
     int total = 0;
 
-    for (i_aux = 0; i_aux < tam; i_aux++) {
-        if (((vetor[i] <= vetor[j]) && (i < (size / 2)))
+    for (int i_aux = 0; i_aux < size; i_aux++) {
+        if (((vet[i] <= vet[j]) && (i < (size / 2)))
             || (j == tam))
-            aux[i_aux] = vetor[i++];
+            aux[i_aux] = vet[i++];
         else
-            aux[i_aux] = vetor[j++];
+            aux[i_aux] = vet[j++];
     }
 
     vet = aux;
