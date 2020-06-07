@@ -57,12 +57,12 @@ int main(int argc, char** argv)
 
 		/* Send matrix data to the worker tasks */
 		
-        RandomNumberGenerator rnd = new RandomNumberGenerator(seed);
+        RandomNumberGenerator* rnd = new RandomNumberGenerator(seed);
 
         //CRIA VETOR RANDOM
         for(int i = 0; i < VEC_SIZE; i++)
         {
-            vec[i] = rnd.GetRandom(0.0, 1000000.0);
+            vec[i] = rnd->GetRandom(0.0, 1000000.0);
         }
 
     }
