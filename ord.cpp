@@ -6,7 +6,6 @@
 # include <ctime>
 # include <cstring>
 #include "mpi.h"
-#include "RandomNumberGenerator.h"
 #define MASTER 0               /* taskid of first task */
 #define FROM_MASTER 1          /* setting a message type */
 #define FROM_WORKER 2          /* setting a message type */
@@ -57,12 +56,12 @@ int main(int argc, char** argv)
 
 		/* Send matrix data to the worker tasks */
 		
-        RandomNumberGenerator* rnd = new RandomNumberGenerator(seed);
+        //RandomNumberGenerator* rnd = new RandomNumberGenerator(seed);
 
         //CRIA VETOR RANDOM
         for(int i = 0; i < VEC_SIZE; i++)
         {
-            vec[i] = rand()%30000;//rnd->GetRandom(0.0, 1000000.0);
+            vec[i] = ((double)rand()%30000);//rnd->GetRandom(0.0, 1000000.0);
         }
 
     }
