@@ -19,6 +19,7 @@ void intercala(double* vet, int size);
 
 int main(int argc, char** argv)
 {
+    printf("INICIANDO");
 
 	int my_rank;       // Identificador deste processo
 
@@ -32,19 +33,22 @@ int main(int argc, char** argv)
 	MPI_Status status;
 
 
+    printf("Iniciando MPI INIT");
 	MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
     
+    printf("Terminou MPI INIT");
     double vec[VEC_SIZE];
-    
+    printf("Inicializou vetor");
 
     if(my_rank != MASTER)
 	{
+        printf("Started Receiving size %d", my_rank);
 
         MPI_Recv(&size, 1, MPI_INT, MASTER, 1, MPI_COMM_WORLD, &status);
         printf("Received size %d", my_rank);
-
+        printf("Started Receiving vec %d", my_rank);
         MPI_Recv(&vec[0], size, MPI_DOUBLE, MASTER, 1, MPI_COMM_WORLD, &status);
         printf("Received vec %d", my_rank);
 
@@ -53,7 +57,7 @@ int main(int argc, char** argv)
     else
     {
 
-		
+		printf("Inicialização do vetor pelo mestre");
 		t1 = MPI_Wtime();  // inicia a contagem do tempo
 
         double start = MPI_Wtime();
