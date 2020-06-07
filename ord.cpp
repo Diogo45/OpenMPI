@@ -134,7 +134,7 @@ void intercala(double* vet, int size)
 
     for (int i_aux = 0; i_aux < size; i_aux++) {
         if (((vet[i] <= vet[j]) && (i < (size / 2)))
-            || (j == tam))
+            || (j == size))
             aux[i_aux] = vet[i++];
         else
             aux[i_aux] = vet[j++];
