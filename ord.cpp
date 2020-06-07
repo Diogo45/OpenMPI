@@ -41,9 +41,13 @@ int main(int argc, char** argv)
 
     if(my_rank != MASTER)
 	{
+
         MPI_Recv(&size, 1, MPI_INT, MASTER, 1, MPI_COMM_WORLD, &status);
+        printf("Received size %d", my_rank);
 
         MPI_Recv(&vec[0], size, MPI_DOUBLE, MASTER, 1, MPI_COMM_WORLD, &status);
+        printf("Received vec %d", my_rank);
+
         //MPI_Recv(&offset, 1, MPI_INT, MASTER, 1, MPI_COMM_WORLD, &status);
     }
     else
@@ -63,32 +67,38 @@ int main(int argc, char** argv)
         {
             vec[i] = (double)rand();//rnd->GetRandom(0.0, 1000000.0);
         }
-
+        printf("Finalizou inicialização do vetor pelo mestre");
     }
 
 
     if(size <= VEC_SIZE/proc_n)
     {
+
+        printf("Chegou na folha em %d",my_rank);
         sort(&vec[0], size);
 
         MPI_Send(&vec[0], size, MPI_DOUBLE, (my_rank - 1) / 2 , 1, MPI_COMM_WORLD);
     }
     else
     {
+        printf("Processo %d iniciou", my_rank);
         int newSize = size/2;
         int newSize2 = newSize + size%2;
         
 		MPI_Send(&newSize, 1, MPI_INT, my_rank * 2 + 1, 1, MPI_COMM_WORLD);
         MPI_Send(&vec[0], newSize, MPI_DOUBLE, my_rank * 2 + 1, 1, MPI_COMM_WORLD);
-
+        printf("Processo %d mandou metade do vetor para processo %d", my_rank,my_rank * 2 + 1);
 		MPI_Send(&newSize2, 1, MPI_INT, my_rank * 2 + 2, 1, MPI_COMM_WORLD);
         MPI_Send(&vec[newSize], newSize2, MPI_DOUBLE, my_rank * 2 + 2, 1, MPI_COMM_WORLD);
-     
+        printf("Processo %d mandou metade do vetor para processo %d", my_rank,my_rank * 2 + 2);
 
         MPI_Recv(&vec[0], newSize, MPI_DOUBLE, my_rank * 2 + 1, 1, MPI_COMM_WORLD, &status);
+        printf("Processo %d RECEBEU metade do vetor para processo %d", my_rank,my_rank * 2 + 1);
         MPI_Recv(&vec[newSize], newSize2, MPI_DOUBLE, my_rank * 2 + 2, 1, MPI_COMM_WORLD, &status);
-
+        printf("Processo %d RECEBEU metade do vetor para processo %d", my_rank,my_rank * 2 + 2);
+        
         intercala(&vec[0], size);
+        printf("Processo %d intercalou vetores", my_rank);
 
     }
 
