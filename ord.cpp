@@ -61,7 +61,7 @@ int main(int argc, char** argv)
         //CRIA VETOR RANDOM
         for(int i = 0; i < VEC_SIZE; i++)
         {
-            vec[i] = ((double)rand()%30000);//rnd->GetRandom(0.0, 1000000.0);
+            vec[i] = (double)(rand()%30000);//rnd->GetRandom(0.0, 1000000.0);
         }
 
     }
