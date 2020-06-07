@@ -23,6 +23,8 @@ int main(int argc, char** argv)
 
 	int proc_n; 
 
+    int size = VEC_SIZE; 
+
 	MPI_Status status;
 
 
@@ -30,7 +32,7 @@ int main(int argc, char** argv)
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
     
-    double vec[] = new double[VEC_SIZE];
+    double vec[VEC_SIZE];
     
 
     if(my_rank != MASTER)
@@ -131,8 +133,7 @@ void sort(double* vetor,int size)
 
 void intercala(double* vet, int size)
 {
-    double* aux;
-    aux = new double[size];
+    double aux[size];
     int i = 0;
     int j = size/2;
     int total = 0;
@@ -140,9 +141,9 @@ void intercala(double* vet, int size)
     for (i_aux = 0; i_aux < tam; i_aux++) {
         if (((vetor[i] <= vetor[j]) && (i < (size / 2)))
             || (j == tam))
-            vetor_auxiliar[i_aux] = vetor[i++];
+            aux[i_aux] = vetor[i++];
         else
-            vetor_auxiliar[i_aux] = vetor[j++];
+            aux[i_aux] = vetor[j++];
     }
 
     vet = aux;
