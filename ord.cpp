@@ -12,7 +12,7 @@
 #define LIVE 0
 #define KILL 1
 
-#define VEC_SIZE 100
+#define VEC_SIZE 10
 
 void sort(double* vetor,int size);
 void intercala(double* vet, int size);
@@ -72,6 +72,9 @@ int main(int argc, char** argv)
             vec[i] = (double)rand();//rnd->GetRandom(0.0, 1000000.0);
         }
         printf("Finalizou inicialização do vetor pelo mestre\n");
+        for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
+
+
     }
 
     int delta =  VEC_SIZE/((proc_n+1)/2);
