@@ -74,7 +74,14 @@ int main(int argc, char** argv)
         }
         printf("Finalizou inicialização do vetor pelo mestre\n");
         //for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
-
+        if(proc_n == 1)
+        {
+            sort(&vec[0],size);
+            t2 = MPI_Wtime(); // termina a contagem do tempo
+            printf("\nTempo de execucao: %f\n\n", t2-t1);
+            MPI_Finalize();
+            return 0;   
+        }
 
     }
 
