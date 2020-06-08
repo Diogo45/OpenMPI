@@ -130,7 +130,11 @@ int main(int argc, char** argv)
         for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
 
 
+    }else
+    {
+        MPI_Send(&vec[0], size, MPI_DOUBLE, (my_rank - 1) / 2 , 1, MPI_COMM_WORLD);
     }
+    
 
     
 }
