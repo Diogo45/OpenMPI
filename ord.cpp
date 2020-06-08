@@ -12,10 +12,11 @@
 #define LIVE 0
 #define KILL 1
 
-#define VEC_SIZE 10
+#define VEC_SIZE 1000000
 
 void sort(double* vetor,int size);
 void intercala(double* vet, int size);
+double vec[VEC_SIZE];
 
 int main(int argc, char** argv)
 {
@@ -39,7 +40,7 @@ int main(int argc, char** argv)
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
     
     //printf("Terminou MPI INIT\n");
-    double vec[VEC_SIZE];
+    
     //printf("Inicializou vetor\n");
 
     if(my_rank != MASTER)
