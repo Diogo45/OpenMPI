@@ -76,6 +76,7 @@ int main(int argc, char** argv)
         //for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
         if(proc_n == 1)
         {
+            printf("Mestre ordenando vetor sozinho\n");
             sort(&vec[0],size);
             t2 = MPI_Wtime(); // termina a contagem do tempo
             printf("\nTempo de execucao: %f\n\n", t2-t1);
