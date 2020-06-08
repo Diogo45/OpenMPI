@@ -74,8 +74,8 @@ int main(int argc, char** argv)
         printf("Finalizou inicialização do vetor pelo mestre\n");
     }
 
-
-    if(size <= VEC_SIZE/proc_n)
+    int delta =  VEC_SIZE/((proc_n+1)/2);
+    if(size <= delta)
     {
 
         printf("Chegou na folha em %d\n",my_rank);
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        printf("Processo %d iniciou (size = %d, VEC_SIZE/proc_n = %d\n", my_rank,size,VEC_SIZE/proc_n);
+        printf("Processo %d iniciou (size = %d, VEC_SIZE/proc_n = %d)\n", my_rank,size,delta);
         int newSize = size/2;
         int newSize2 = newSize + size%2;
         
