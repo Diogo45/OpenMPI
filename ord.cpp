@@ -84,12 +84,12 @@ int main(int argc, char** argv)
 
         printf("Chegou na folha em %d\n",my_rank);
         sort(&vec[0], size);
-        printf("Vetor ordenado por %d\n",my_rank);
+        //printf("Vetor ordenado por %d\n",my_rank);
         //for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
 
-        printf("Proc %d tendando mandar vetor ordenado para proc %d \n",my_rank,(my_rank - 1) / 2 );
+        //printf("Proc %d tendando mandar vetor ordenado para proc %d \n",my_rank,(my_rank - 1) / 2 );
         MPI_Send(&vec[0], size, MPI_DOUBLE, (my_rank - 1) / 2 , 1, MPI_COMM_WORLD);
-        printf("Proc %d MANDOU vetor ordenado para proc %d \n",my_rank,(my_rank - 1) / 2 );
+        //printf("Proc %d MANDOU vetor ordenado para proc %d \n",my_rank,(my_rank - 1) / 2 );
         MPI_Finalize();
         return 0;
        
