@@ -90,6 +90,7 @@ int main(int argc, char** argv)
         MPI_Send(&vec[0], size, MPI_DOUBLE, (my_rank - 1) / 2 , 1, MPI_COMM_WORLD);
         printf("Proc %d MANDOU vetor ordenado para proc %d \n",my_rank,(my_rank - 1) / 2 );
         MPI_Finalize();
+        return 0;
        
     }
     else
