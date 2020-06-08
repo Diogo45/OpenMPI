@@ -109,9 +109,13 @@ int main(int argc, char** argv)
 
         printf("Vetor antes da intercalaçao por %d\n",my_rank);
         for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
+        printf("\n");
         intercala(&vec[0], size);
         printf("Processo %d intercalou vetores : \n", my_rank);
         for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
+
+        printf("\n");
+
     }
 
     if(my_rank == MASTER)
@@ -163,10 +167,13 @@ void intercala(double* vet, int size)
     }
     
 
-    printf("VET AUX : ");
+    printf("VET AUX: \n");
     for(int i = 0; i < size; i++) { std::cout << aux[i] << ", "; }
+    printf("\n");
 
-    vet = aux;
+    //vet = &aux[0];
+
+    memcpy(&vec, &aux, size);
 
 
 
