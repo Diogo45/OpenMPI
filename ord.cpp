@@ -85,6 +85,8 @@ int main(int argc, char** argv)
         sort(&vec[0], size);
 
         MPI_Send(&vec[0], size, MPI_DOUBLE, (my_rank - 1) / 2 , 1, MPI_COMM_WORLD);
+        printf("Vetor ordenado por %d\n",my_rank);
+        for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
     }
     else
     {
@@ -104,9 +106,12 @@ int main(int argc, char** argv)
         MPI_Recv(&vec[newSize], newSize2, MPI_DOUBLE, my_rank * 2 + 2, 1, MPI_COMM_WORLD, &status);
         printf("Processo %d RECEBEU metade do vetor para processo %d\n", my_rank,my_rank * 2 + 2);
         
-        intercala(&vec[0], size);
-        printf("Processo %d intercalou vetores\n", my_rank);
 
+        printf("Vetor antes da intercalaçao por %d\n",my_rank);
+        for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
+        intercala(&vec[0], size);
+        printf("Processo %d intercalou vetores : \n", my_rank);
+        for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
     }
 
     if(my_rank == MASTER)
@@ -156,6 +161,13 @@ void intercala(double* vet, int size)
         else
             aux[i_aux] = vet[j++];
     }
+    
 
-    vet = aux;
+    printf("VET AUX : ");
+    for(int i = 0; i < size; i++) { std::cout << aux[i] << ", "; }
+
+    &vet[0] = &aux[0];
+
+
+
 }
