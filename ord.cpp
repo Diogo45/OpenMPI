@@ -19,7 +19,7 @@ void intercala(double* vet, int size);
 
 int main(int argc, char** argv)
 {
-    printf("INICIANDO\n");
+    //printf("INICIANDO\n");
 
 	int my_rank;       // Identificador deste processo
 
@@ -33,12 +33,12 @@ int main(int argc, char** argv)
 	MPI_Status status;
 
 
-    printf("Iniciando MPI INIT\n");
+    //printf("Iniciando MPI INIT\n");
 	MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
     
-    printf("Terminou MPI INIT\n");
+    //printf("Terminou MPI INIT\n");
     double vec[VEC_SIZE];
     printf("Inicializou vetor\n");
 
@@ -46,10 +46,10 @@ int main(int argc, char** argv)
 	{
         printf("Started Receiving size %d\n", my_rank);
 
-        MPI_Recv(&size, 1, MPI_INT, MASTER, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&size, 1, MPI_INT, (my_rank - 1) / 2, 1, MPI_COMM_WORLD, &status);
         printf("Received size %d\n", my_rank);
         printf("Started Receiving vec %d\n", my_rank);
-        MPI_Recv(&vec[0], size, MPI_DOUBLE, MASTER, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&vec[0], size, MPI_DOUBLE, (my_rank - 1) / 2, 1, MPI_COMM_WORLD, &status);
         printf("Received vec %d\n", my_rank);
 
         //MPI_Recv(&offset, 1, MPI_INT, MASTER, 1, MPI_COMM_WORLD, &status);
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        printf("Processo %d iniciou\n", my_rank);
+        printf("Processo %d iniciou (size = %d, VEC_SIZE/proc_n = %d\n", my_rank,size,VEC_SIZE/proc_n);
         int newSize = size/2;
         int newSize2 = newSize + size%2;
         
