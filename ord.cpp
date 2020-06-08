@@ -173,7 +173,7 @@ void intercala(double* vet, int size)
 
     //vet = &aux[0];
 
-    memcpy(&vec, &aux, size);
+    memcpy(&vet, &aux, size * sizeof(double));
 
 
 
