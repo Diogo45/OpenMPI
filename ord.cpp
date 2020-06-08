@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     }
 
     int delta =  VEC_SIZE/((proc_n+1)/2);
-    if(size <= delta)
+    if(size <= delta+1)
     {
 
         printf("Chegou na folha em %d\n",my_rank);
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        printf("Processo %d iniciou (size = %d, VEC_SIZE/proc_n = %d)\n", my_rank,size,delta);
+        printf("Processo %d iniciou (size = %d, VEC_SIZE/((proc_n+1)/2 = %d)\n", my_rank,size,delta);
         int newSize = size/2;
         int newSize2 = newSize + size%2;
         
