@@ -120,7 +120,7 @@ int main(int argc, char** argv)
         //printf("Processo %d intercalou vetores : \n", my_rank);
         //for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
 
-        printf("\n");
+        //printf("\n");
 
     }
 
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
         printf("\nTempo de execucao: %f\n\n", t2-t1);   
 
 
-        for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
+        //for(int i = 0; i < size; i++) { std::cout << vec[i] << ", "; }
 
 
     }else
