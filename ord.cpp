@@ -166,7 +166,7 @@ void intercala(double* vet, int size)
     printf("VET AUX : ");
     for(int i = 0; i < size; i++) { std::cout << aux[i] << ", "; }
 
-    &vet[0] = &aux[0];
+    vet = aux;
 
 
 
