@@ -4,7 +4,7 @@
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
 #define ARRAY_SIZE 100000      // trabalho final com o valores 10.000, 100.000, 1.000.000
-#define PARTE 10000
+#define PARTE 5000
 
 
 int vetor[ARRAY_SIZE];
