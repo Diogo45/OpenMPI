@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
 
-    for(int i = ARRAY_SIZE; i >= 0; i--) vetor[i] = i;
+    for(int i = 0; i < ARRAY_SIZE; i++) vetor[i] = ARRAY_SIZE-i-1;
         
     while(!pronto)
     {
@@ -58,8 +58,8 @@ int main(int argc, char** argv)
 
         bs(tam_aux, &vetor[my_rank * tam]);
         //printf("Process %d sorted vector:\n[",my_rank,my_rank + 1);
-        for(int i = 0; i < tam_aux; i++) printf(" %d ",vetor[my_rank * tam + i]);
-        printf("]\n");
+        //for(int i = 0; i < tam_aux; i++) printf(" %d ",vetor[my_rank * tam + i]);
+        //printf("]\n");
         
         if(my_rank != proc_n-1)
         {
