@@ -30,9 +30,9 @@ void bs(int n, int * vetor)
 }
 */
 
-void bs(int size, double* vet)
+void bs(int size, int* vet)
 {
-    double aux[size];
+    int aux[size];
     int i = 0;
     int j = size/2;
     int total = 0;
