@@ -4,7 +4,10 @@
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
 #define ARRAY_SIZE 10000      // trabalho final com o valores 10.000, 100.000, 1.000.000
-#define PARTE 50
+#define PARTE 500
+
+
+int vetor[ARRAY_SIZE];
 
 void bs(int n, int * vetor)
 {
@@ -27,7 +30,7 @@ void bs(int n, int * vetor)
 
 int main(int argc, char** argv)
 {
-    int vetor[ARRAY_SIZE];
+    
     int my_rank, proc_n;
     bool pronto = false;
     MPI_Status status;
