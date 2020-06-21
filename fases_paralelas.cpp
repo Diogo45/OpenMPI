@@ -49,10 +49,12 @@ int main(int argc, char** argv)
         int resto = ARRAY_SIZE%proc_n;
         int maior_elem;
         int tam_aux = tam;
+        int tam_aux_ultimo = tam_aux + resto;
         if(my_rank == proc_n-1)
         {
             tam_aux+=resto;
         }
+        
 
         bs(tam_aux, &vetor[my_rank * tam]);
         printf("Process %d sorted vector:\n[",my_rank,my_rank + 1);
@@ -97,8 +99,38 @@ int main(int argc, char** argv)
             }
         }
         
-        if(pronto) break;
+        if(pronto) 
+        {
+            if(my_rank == 0)
+            {
+                for(int i = 1; i <proc_n; i++)
+                {
+                    if(i == proc_n-1)
+                    {
+                        MPI_Recv(&vetor[i*tam], tam_aux_ultimo, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
+                    }else
+                    {
+                        MPI_Recv(&vetor[i*tam], tam_aux, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
+                    }
+                    
+                    
+                }
+                printf("VETOR FINAL : \n[")
+                for(int i = 0; i <ARRAY_SIZE; i++)
+                {
+                    printf(" %d ",vetor[i]);
+                }
+            
+                    
+            }
+            else
+            {
+                MPI_Send(&vetor[my_rank*tam], 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
 
+
+            }
+            break;
+        }
         printf("Process %d finished bcast\n",my_rank);
 
 
