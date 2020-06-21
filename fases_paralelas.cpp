@@ -55,8 +55,7 @@ int main(int argc, char** argv)
         }
 
         bs(tam_aux, &vetor[my_rank * tam]);
-        printf("Process %d sorted vector:\n",my_rank,my_rank + 1);
-        printf("[");
+        printf("Process %d sorted vector:\n[",my_rank,my_rank + 1);
         for(int i = 0; i < tam_aux; i++) printf(" %d ",vetor[my_rank * tam + i]);
         printf("]\n");
         
@@ -72,7 +71,9 @@ int main(int argc, char** argv)
             MPI_Recv(&maior_elem, 1, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD, &status);
             printf("Process %d Receiveid maior_elem %d from %d\n",my_rank, maior_elem, my_rank-1);
 
-            if(maior_elem > vetor[my_rank*tam + tam_aux - 1])
+
+            printf("Process %d comparing maior_elem %d with its lowest elem %d\n",my_rank, maior_elem, vetor[my_rank*tam + tam_aux - 1]);
+            if(maior_elem <= vetor[my_rank*tam + tam_aux - 1])
             {
                 estado[my_rank] = 1;
             }
