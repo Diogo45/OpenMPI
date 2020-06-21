@@ -125,7 +125,7 @@ int main(int argc, char** argv)
             }
             else
             {
-                MPI_Send(&vetor[my_rank*tam], 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+                MPI_Send(&vetor[my_rank*tam, tam_aux, MPI_INT, 0, 1, MPI_COMM_WORLD);
 
 
             }
