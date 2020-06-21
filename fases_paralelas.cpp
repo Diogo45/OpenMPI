@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
         int vetor_aux[PARTE * 2];
 
-        if(my_rank != proc_n)
+        if(my_rank != proc_n - 1)
         {
 
             printf("Process %d receveing lower part from %d \n",my_rank + 1, my_rank);
