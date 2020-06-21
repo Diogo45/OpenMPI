@@ -149,11 +149,17 @@ int main(int argc, char** argv)
         if(my_rank != proc_n - 1)
         {
 
-            printf("Process %d receveing lower part from %d \n",my_rank, my_rank+1);
+            for (int i = 0; i < PARTE; i++)
+            {
+                vetor_aux[i] = vetor[my_rank*tam + tam_aux - PARTE + i];
+            }
 
-            MPI_Recv(&vetor_aux[0], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD, &status);
+            printf("Process %d receveing lower part from %d \n",my_rank, my_rank+1);
+            MPI_Recv(&vetor_aux[PARTE], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD, &status);
 
             printf("Process %d received lower part from %d \n",my_rank, my_rank+1);
+
+            
             printf("Process %d vetor_aux to be sorted : \n [",my_rank);
             for (int i = 0; i < PARTE*2; i++)
             {
