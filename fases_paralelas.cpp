@@ -120,7 +120,7 @@ int main(int argc, char** argv)
                 {
                     printf(" %d ",vetor[i]);
                 }
-                printf("]");
+                printf("]\n");
             
                     
             }
