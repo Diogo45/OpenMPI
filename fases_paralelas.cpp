@@ -115,7 +115,7 @@ int main(int argc, char** argv)
                     
                     
                 }
-                printf("VETOR FINAL : \n[")
+                printf("VETOR FINAL : \n[");
                 for(int i = 0; i <ARRAY_SIZE; i++)
                 {
                     printf(" %d ",vetor[i]);
