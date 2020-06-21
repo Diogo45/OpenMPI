@@ -57,8 +57,8 @@ int main(int argc, char** argv)
         bs(tam_aux, &vetor[my_rank * tam]);
         printf("Process %d sorted vector:\n",my_rank,my_rank + 1);
         printf("[");
-        for(int i = ARRAY_SIZE; i >= 0; i--) printf(" %d ",vetor[i]);
-        printf("]");
+        for(int i = 0; i < tam_aux; i++) printf(" %d ",vetor[my_rank * tam + i]);
+        printf("]\n");
         
         if(my_rank != proc_n-1)
         {
