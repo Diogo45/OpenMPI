@@ -30,7 +30,7 @@ void bs(int n, int * vetor)
 }
 */
 
-void sort(int size, int* vetor)
+void bs(int size, int* vetor)
 {
 
     for(int i=0;i<size-1;i++)
