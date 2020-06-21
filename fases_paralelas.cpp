@@ -30,30 +30,23 @@ void bs(int n, int * vetor)
 }
 */
 
-void bs(int size, int* vet)
+void sort(int size, int* vetor)
 {
-    int aux[size];
-    int i = 0;
-    int j = size/2;
-    int total = 0;
 
-    for (int i_aux = 0; i_aux < size; i_aux++) {
-        if (((vet[i] <= vet[j]) && (i < (size / 2)))
-            || (j == size))
-            aux[i_aux] = vet[i++];
-        else
-            aux[i_aux] = vet[j++];
+    for(int i=0;i<size-1;i++)
+    {
+        for(int j = i+1;j<size;j++)
+        {
+            if( vetor[i] > vetor[j])
+            {
+                int aux = vetor[i];
+                vetor[i] = vetor[j];
+                vetor[j] = aux;
+            }
+        }
     }
-    
-
-
-    for(int i = 0; i < size; i++) { vet[i] = aux[i]; }
-
-
 
 }
-
-
 int main(int argc, char** argv)
 {
     
