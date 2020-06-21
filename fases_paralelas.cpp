@@ -3,8 +3,8 @@
 #include "mpi.h"
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
-#define ARRAY_SIZE 500000      // trabalho final com o valores 10.000, 100.000, 1.000.000
-#define PARTE 10000
+#define ARRAY_SIZE 100000      // trabalho final com o valores 10.000, 100.000, 1.000.000
+#define PARTE 1000
 
 
 int vetor[ARRAY_SIZE];
@@ -146,6 +146,18 @@ int main(int argc, char** argv)
                     
                     
                 }
+                
+                bool sorted = true;
+
+                for (size_t i = 0; i < ARRAY_SIZE - 1; i++)
+                {
+                    if(vetor[i] >= vetor[i + 1])
+                    {
+                        sorted = false;
+                    }
+                }
+                
+                printf("VETOR SORTED: %s", sorted ? "true" : "false");
 
                 
                 /*
