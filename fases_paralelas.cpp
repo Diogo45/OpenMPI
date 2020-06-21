@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         }
         int tam = ARRAY_SIZE/proc_n;
         int resto = ARRAY_SIZE%proc_n;
-        int menor_elem;
+        int maior_elem;
         int tam_aux = tam;
         if(my_rank == proc_n-1)
         {
@@ -58,14 +58,17 @@ int main(int argc, char** argv)
         
         if(my_rank != proc_n-1)
         {
+            printf("Process %d sending highest element to %d\n",my_rank,my_rank + 1);
             MPI_Send(&vetor[my_rank*tam + tam_aux - 1], 1, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD);
         }
 
         if(my_rank != 0)
         {
-            
-            MPI_Recv(&menor_elem, 1, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD, &status);
-            if(menor_elem > vetor[my_rank*tam + tam_aux - 1])
+            printf("Process %d Started Receiveing maior_elem from %d\n", my_rank,my_rank-1);
+            MPI_Recv(&maior_elem, 1, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD, &status);
+            printf("Process %d Receiveid maior_elem %d from %d\n",my_rank, maior_elem, my_rank-1);
+
+            if(maior_elem > vetor[my_rank*tam + tam_aux - 1])
             {
                 estado[my_rank] = 1;
             }
@@ -77,20 +80,30 @@ int main(int argc, char** argv)
         pronto = true;
         for(int i = 1; i <proc_n; i++)
         {
+            printf("Process %d bcast\n",my_rank);
             MPI_Bcast(&estado[i], 1, MPI_INT, i, MPI_COMM_WORLD);
             if(estado[i] == 0)
             {
+
                 pronto = false;
+                printf("Process %d hasnt finished sorting\n",my_rank);
+
                 break;
             }
         }
         
         if(pronto) break;
 
+        printf("Process %d finished bcast\n",my_rank);
+
 
         if(my_rank != 0)
         {
+            printf("Process %d started sending lower part to %d \n",my_rank, my_rank - 1);
+
             MPI_Send(&vetor[my_rank*tam], PARTE, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD);
+
+            printf("Process %d sent lower part to %d \n",my_rank, my_rank - 1);
         }
 
         int vetor_aux[PARTE * 2];
@@ -98,13 +111,16 @@ int main(int argc, char** argv)
         if(my_rank != proc_n)
         {
 
+            printf("Process %d receveing lower part from %d \n",my_rank + 1, my_rank);
 
             MPI_Recv(&vetor_aux[0], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD, &status);
 
+            printf("Process %d received lower part from %d \n",my_rank + 1, my_rank);
 
             bs(PARTE*2, vetor_aux);
 
             MPI_Send(&vetor_aux[PARTE], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD);
+            printf("Process %d send back lower part to %d \n",my_rank, my_rank +1);
 
             for(int i = 0; i< PARTE;i++)
             {
@@ -118,8 +134,9 @@ int main(int argc, char** argv)
         }
 
         if(my_rank != 0){
-
+ 
             MPI_Recv(&vetor[my_rank*tam], PARTE, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD, &status);
+            printf("Process %d receveing its lower part from %d \n",my_rank, my_rank - 1);
 
         }
     }
