@@ -74,8 +74,8 @@ int main(int argc, char** argv)
             printf("Process %d Receiveid maior_elem %d from %d\n",my_rank, maior_elem, my_rank-1);
 
 
-            printf("Process %d comparing maior_elem %d with its lowest elem %d\n",my_rank, maior_elem, vetor[my_rank*tam + tam_aux - 1]);
-            if(maior_elem <= vetor[my_rank*tam + tam_aux - 1])
+            printf("Process %d comparing maior_elem %d with its lowest elem %d\n",my_rank, maior_elem, vetor[my_rank*tam]);
+            if(maior_elem <= vetor[my_rank*tam])
             {
                 estado[my_rank] = 1;
             }
