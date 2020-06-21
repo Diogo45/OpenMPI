@@ -4,11 +4,12 @@
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
 #define ARRAY_SIZE 10000      // trabalho final com o valores 10.000, 100.000, 1.000.000
-#define PARTE 500
+#define PARTE 50
 
 
 int vetor[ARRAY_SIZE];
 
+/*
 void bs(int n, int * vetor)
 {
     int c=0, d, troca, trocou =1;
@@ -27,6 +28,31 @@ void bs(int n, int * vetor)
         c++;
         }
 }
+*/
+
+void bs(int size, double* vet)
+{
+    double aux[size];
+    int i = 0;
+    int j = size/2;
+    int total = 0;
+
+    for (int i_aux = 0; i_aux < size; i_aux++) {
+        if (((vet[i] <= vet[j]) && (i < (size / 2)))
+            || (j == size))
+            aux[i_aux] = vet[i++];
+        else
+            aux[i_aux] = vet[j++];
+    }
+    
+
+
+    for(int i = 0; i < size; i++) { vet[i] = aux[i]; }
+
+
+
+}
+
 
 int main(int argc, char** argv)
 {
