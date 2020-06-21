@@ -3,7 +3,7 @@
 #include "mpi.h"
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
-#define ARRAY_SIZE 1000000      // trabalho final com o valores 10.000, 100.000, 1.000.000
+#define ARRAY_SIZE 100000      // trabalho final com o valores 10.000, 100.000, 1.000.000
 #define PARTE 50000
 
 
