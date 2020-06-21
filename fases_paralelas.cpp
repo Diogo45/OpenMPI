@@ -181,7 +181,7 @@ int main(int argc, char** argv)
 
             for(int i = 0; i< PARTE;i++)
             {
-                vetor[my_rank*tam + i] = vetor_aux[i];
+                vetor[my_rank*tam + tam_aux - PARTE + i]; = vetor_aux[i];
             }
 
          //   1 2 4 5 || 3 6 7 8
