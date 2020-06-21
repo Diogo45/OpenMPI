@@ -25,10 +25,10 @@ void bs(int n, int * vetor)
         }
 }
 
-int main()
+int main(int argc, char** argv)
 {
     int vetor[ARRAY_SIZE];
-    
+    int my_rank, proc_n;
     bool pronto = false;
     
     MPI_Init(&argc,&argv);
@@ -40,7 +40,7 @@ int main()
     while(!pronto)
     {
         bool estado[proc_n];
-        for(int i = 0; i<proc_n,i++)
+        for(int i = 0; i<proc_n;i++)
         {
             estado[i] = false;
         }
@@ -53,7 +53,7 @@ int main()
             tam_aux+=resto;
         }
 
-        bs(tam_aux, vetor[my_rank*tam])
+        bs(tam_aux, vetor[my_rank*tam]);
         
         if(my_rank != proc_n-1)
         {
@@ -65,7 +65,7 @@ int main()
             MPI_Recv(&menor_elem, 1, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD);
             if(menor_elem > vetor[my_rank*tam + tam_aux - 1])
             {
-                estados[my_rank] = true;
+                estado[my_rank] = true;
             }
         }
         
@@ -91,7 +91,7 @@ int main()
             MPI_Send(&vetor[my_rank*tam], PARTE, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD);
         }
 
-        vetor_aux[PARTE * 2];
+        int vetor_aux[PARTE * 2];
 
         if(my_rank != proc_n)
         {
@@ -124,6 +124,6 @@ int main()
 
 
     MPI_Finalize();
-    
+
     return 0;
 }
