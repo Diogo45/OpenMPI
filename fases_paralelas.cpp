@@ -40,10 +40,10 @@ int main(int argc, char** argv)
         
     while(!pronto)
     {
-        bool estado[proc_n];
+        int estado[proc_n];
         for(int i = 0; i<proc_n;i++)
         {
-            estado[i] = false;
+            estado[i] = 0;
         }
         int tam = ARRAY_SIZE/proc_n;
         int resto = ARRAY_SIZE%proc_n;
@@ -64,10 +64,10 @@ int main(int argc, char** argv)
         if(my_rank != 0)
         {
             
-            MPI_Recv(&menor_elem, 1, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD);
+            MPI_Recv(&menor_elem, 1, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD, &status);
             if(menor_elem > vetor[my_rank*tam + tam_aux - 1])
             {
-                estado[my_rank] = true;
+                estado[my_rank] = 1;
             }
         }
         
@@ -77,8 +77,8 @@ int main(int argc, char** argv)
         pronto = true;
         for(int i = 1; i <proc_n; i++)
         {
-            MPI_Bcast(&estado[i], 1, MPI_C_BOOL, i, MPI_COMM_WORLD);
-            if(!estado[i])
+            MPI_Bcast(&estado[i], 1, MPI_INT, i, MPI_COMM_WORLD);
+            if(estado[i] == 0)
             {
                 pronto = false;
                 break;
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
 
             bs(PARTE*2, vetor_aux);
 
-            MPI_Send(&vetor_aux[PARTE], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD, &status);
+            MPI_Send(&vetor_aux[PARTE], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD);
 
             for(int i = 0; i< PARTE;i++)
             {
