@@ -3,13 +3,13 @@
 #include "mpi.h"
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
-#define ARRAY_SIZE 100000  // trabalho final com o valores 10.000, 100.000, 1.000.000
+#define ARRAY_SIZE 1000000  // trabalho final com o valores 10.000, 100.000, 1.000.000
 #define PARTE 0.5
 
 
 int vetor[ARRAY_SIZE];
 
-
+/*
 void bs(int n, int * vetor)
 {
     int c=0, d, troca, trocou =1;
@@ -28,7 +28,7 @@ void bs(int n, int * vetor)
         c++;
         }
 }
-
+*/
 
 void intercala( int size, int* vet)
 {
@@ -52,7 +52,7 @@ void intercala( int size, int* vet)
 
 
 }
-/*
+
 void bs(int size, int* vetor)
 {
 
@@ -70,7 +70,7 @@ void bs(int size, int* vetor)
     }
 
 }
-*/
+
 
 int main(int argc, char** argv)
 {
