@@ -4,7 +4,7 @@
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
 #define ARRAY_SIZE 100000  // trabalho final com o valores 10.000, 100.000, 1.000.000
-#define PARTE 2500
+#define PARTE 0.45
 
 
 int vetor[ARRAY_SIZE];
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     int my_rank, proc_n;
     bool pronto = false;
     MPI_Status status;
-    
+    int part;
 
     double t1,t2;
 
@@ -106,6 +106,7 @@ int main(int argc, char** argv)
             tam_aux+=resto;
         }
         
+        part = tam * PARTE;
 
         bs(tam_aux, &vetor[my_rank * tam]);
         //printf("Process %d sorted vector:\n[",my_rank,my_rank + 1);
@@ -173,7 +174,7 @@ int main(int argc, char** argv)
                 
                 bool sorted = true;
 
-                for (size_t i = 0; i < ARRAY_SIZE - 1; i++)
+                for (int i = 0; i < ARRAY_SIZE - 1; i++)
                 {
                     if(vetor[i] >= vetor[i + 1])
                     {
@@ -210,49 +211,49 @@ int main(int argc, char** argv)
         {
             //printf("Process %d started sending lower part to %d \n",my_rank, my_rank - 1);
 
-            MPI_Send(&vetor[my_rank*tam], PARTE, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD);
+            MPI_Send(&vetor[my_rank*tam], part, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD);
 
             //printf("Process %d sent lower part to %d \n",my_rank, my_rank - 1);
         }
 
-        int vetor_aux[PARTE * 2];
+        int vetor_aux[part * 2];
 
         if(my_rank != proc_n - 1)
         {
 
-            for (int i = 0; i < PARTE; i++)
+            for (int i = 0; i < part; i++)
             {
-                vetor_aux[i] = vetor[my_rank*tam + tam_aux - PARTE + i];
+                vetor_aux[i] = vetor[my_rank*tam + tam_aux - part + i];
             }
 
             //printf("Process %d receveing lower part from %d \n",my_rank, my_rank+1);
-            MPI_Recv(&vetor_aux[PARTE], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&vetor_aux[part], part, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD, &status);
 
             //printf("Process %d received lower part from %d \n",my_rank, my_rank+1);
 
             
             //printf("Process %d vetor_aux to be sorted : \n [",my_rank);
-            //for (int i = 0; i < PARTE*2; i++)
+            //for (int i = 0; i < part*2; i++)
             //{
                 //printf(" %d ",vetor_aux[i]);
             //}
             //printf("]\n");
             
-            intercala(PARTE*2, vetor_aux);
+            intercala(part*2, vetor_aux);
 
             //printf("Process %d vetor_aux AFTER sort : \n [",my_rank);
-            //for (int i = 0; i < PARTE*2; i++)
+            //for (int i = 0; i < part*2; i++)
             //{
                 //printf(" %d ",vetor_aux[i]);
             //}
             //printf("]\n");
 
-            MPI_Send(&vetor_aux[PARTE], PARTE, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD);
+            MPI_Send(&vetor_aux[part], part, MPI_INT, my_rank + 1, 1, MPI_COMM_WORLD);
             //printf("Process %d send back lower part to %d \n",my_rank, my_rank +1);
 
-            for(int i = 0; i< PARTE;i++)
+            for(int i = 0; i< part;i++)
             {
-                vetor[my_rank*tam + tam_aux - PARTE + i] = vetor_aux[i];
+                vetor[my_rank*tam + tam_aux - part + i] = vetor_aux[i];
             }
 
          //   1 2 4 5 || 3 6 7 8
@@ -263,7 +264,7 @@ int main(int argc, char** argv)
 
         if(my_rank != 0){
  
-            MPI_Recv(&vetor[my_rank*tam], PARTE, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&vetor[my_rank*tam], part, MPI_INT, my_rank - 1, 1, MPI_COMM_WORLD, &status);
             //printf("Process %d receveing its lower part from %d \n",my_rank, my_rank - 1);
 
         }
