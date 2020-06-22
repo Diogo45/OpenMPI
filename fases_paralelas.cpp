@@ -9,7 +9,7 @@
 
 int vetor[ARRAY_SIZE];
 
-/*
+
 void bs(int n, int * vetor)
 {
     int c=0, d, troca, trocou =1;
@@ -28,7 +28,7 @@ void bs(int n, int * vetor)
         c++;
         }
 }
-*/
+
 
 void intercala( int size, int* vet)
 {
@@ -52,7 +52,7 @@ void intercala( int size, int* vet)
 
 
 }
-
+/*
 void bs(int size, int* vetor)
 {
 
@@ -70,6 +70,7 @@ void bs(int size, int* vetor)
     }
 
 }
+*/
 
 int main(int argc, char** argv)
 {
