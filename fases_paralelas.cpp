@@ -3,8 +3,8 @@
 #include "mpi.h"
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
-#define ARRAY_SIZE 10000  // trabalho final com o valores 10.000, 100.000, 1.000.000
-#define PARTE 150
+#define ARRAY_SIZE 100000  // trabalho final com o valores 10.000, 100.000, 1.000.000
+#define PARTE 1500
 
 
 int vetor[ARRAY_SIZE];
@@ -29,6 +29,29 @@ void bs(int n, int * vetor)
         }
 }
 */
+
+void intercala( int size, int* vet)
+{
+    int aux[size];
+    int i = 0;
+    int j = size/2;
+    int total = 0;
+
+    for (int i_aux = 0; i_aux < size; i_aux++) {
+        if (((vet[i] <= vet[j]) && (i < (size / 2)))
+            || (j == size))
+            aux[i_aux] = vet[i++];
+        else
+            aux[i_aux] = vet[j++];
+    }
+    
+
+
+    for(int i = 0; i < size; i++) { vet[i] = aux[i]; }
+
+
+
+}
 
 void bs(int size, int* vetor)
 {
@@ -215,7 +238,7 @@ int main(int argc, char** argv)
             //}
             //printf("]\n");
             
-            bs(PARTE*2, vetor_aux);
+            intercala(PARTE*2, vetor_aux);
 
             //printf("Process %d vetor_aux AFTER sort : \n [",my_rank);
             //for (int i = 0; i < PARTE*2; i++)
