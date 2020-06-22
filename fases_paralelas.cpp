@@ -4,12 +4,12 @@
 
 #define DEBUG 1            // comentar esta linha quando for medir tempo
 #define ARRAY_SIZE 100000  // trabalho final com o valores 10.000, 100.000, 1.000.000
-#define PARTE 1500
+#define PARTE 500
 
 
 int vetor[ARRAY_SIZE];
 
-
+/*
 void bs(int n, int * vetor)
 {
     int c=0, d, troca, trocou =1;
@@ -28,8 +28,8 @@ void bs(int n, int * vetor)
         c++;
         }
 }
+*/
 
-/*
 void bs(int size, int* vetor)
 {
 
@@ -47,7 +47,7 @@ void bs(int size, int* vetor)
     }
 
 }
-*/
+
 int main(int argc, char** argv)
 {
     
