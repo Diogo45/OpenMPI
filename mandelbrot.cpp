@@ -322,7 +322,7 @@ int main(int argc, char** argv)
 			# pragma omp parallel \
 			shared ( b, count, count_max, g, r, x_max, x_min, y_max, y_min ) \
 			private ( i, j, k, x, x1, x2, y, y1, y2)
-				{
+			{
 			# pragma omp for schedule(dynamic)
 				for (i = offset; i < offset + rows; i++)
 				{
