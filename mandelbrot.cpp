@@ -144,7 +144,7 @@ int main(int argc, char** argv)
 
 		/* Send matrix data to the worker tasks */
 
-		int tasks = (proc_n - 1); //numero de tasks, baseado na quantidade de workers (proc_n-1)
+		int tasks = (proc_n - 1) * 10; //numero de tasks, baseado na quantidade de workers (proc_n-1)
 
 		kill_flag = LIVE; //flag enviada para matar os workers
 		averow = m/tasks; //média de linhas por número de tasjs a seren criadas
