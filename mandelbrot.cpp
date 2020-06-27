@@ -219,7 +219,7 @@ int main(int argc, char** argv)
 				
 				mtype = FROM_MASTER;
 
-				printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+				//printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
 				//distribui linhas do resto se necessário
 				if(extra > 0)
