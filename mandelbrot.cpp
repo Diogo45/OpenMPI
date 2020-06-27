@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
 
-	prinf("MPI process rank %d started", my_rank);
+	printf("MPI process rank %d started", my_rank);
 
 
 	b = i4pp_new(m, n);
