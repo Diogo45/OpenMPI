@@ -6,7 +6,6 @@
 # include <ctime>
 # include <cstring>
 # include "mpi.h"
-# include <omp.h>
 
 #define MASTER 0               /* taskid of first task */
 #define FROM_MASTER 1          /* setting a message type */
@@ -325,65 +324,65 @@ int main(int argc, char** argv)
 			private ( i, j, k, x, x1, x2, y, y1, y2)
 				{
 			# pragma omp for schedule(dynamic)
-			for (i = offset; i < offset + rows; i++)
-			{
-
-
-				for (j = 0; j < n; j++)
+				for (i = offset; i < offset + rows; i++)
 				{
 
 
-					x = ((double)(j - 1) * x_max
-					+ (double)(m - j) * x_min)
-					/ (double)(m - 1);
-
-					y = ((double)(i - 1) * y_max
-						+ (double)(n - i) * y_min)
-						/ (double)(n - 1);
-
-
-					count[i][j] = 0;
-
-					x1 = x;
-					y1 = y;
-
-					for (k = 1; k <= count_max; k++)
+					for (j = 0; j < n; j++)
 					{
-						x2 = x1 * x1 - y1 * y1 + x;
-						y2 = 2 * x1 * y1 + y;
 
-						if (x2 < -2 || 2 < x2 || y2 < -1 || 1 < y2)
+
+						x = ((double)(j - 1) * x_max
+						+ (double)(m - j) * x_min)
+						/ (double)(m - 1);
+
+						y = ((double)(i - 1) * y_max
+							+ (double)(n - i) * y_min)
+							/ (double)(n - 1);
+
+
+						count[i][j] = 0;
+
+						x1 = x;
+						y1 = y;
+
+						for (k = 1; k <= count_max; k++)
 						{
-							count[i][j] = k;
-							break;
+							x2 = x1 * x1 - y1 * y1 + x;
+							y2 = 2 * x1 * y1 + y;
+
+							if (x2 < -2 || 2 < x2 || y2 < -1 || 1 < y2)
+							{
+								count[i][j] = k;
+								break;
+							}
+							x1 = x2;
+							y1 = y2;
 						}
-						x1 = x2;
-						y1 = y2;
+
+						if ((count[i][j] % 2) == 1)
+						{
+							r[i][j] = 255;
+							g[i][j] = 255;
+							b[i][j] = 255;
+						}
+						else
+						{
+							c = (int)(255.0 * sqrt(sqrt(sqrt(
+								((double)(count[i][j]) / (double)(count_max))))));
+							r[i][j] = 3 * c / 5;
+							g[i][j] = 3 * c / 5;
+							b[i][j] = c;
+						}
+
+
+					
+
 					}
-
-					if ((count[i][j] % 2) == 1)
-					{
-						r[i][j] = 255;
-						g[i][j] = 255;
-						b[i][j] = 255;
-					}
-					else
-					{
-						c = (int)(255.0 * sqrt(sqrt(sqrt(
-							((double)(count[i][j]) / (double)(count_max))))));
-						r[i][j] = 3 * c / 5;
-						g[i][j] = 3 * c / 5;
-						b[i][j] = c;
-					}
-
-
-				
-
 				}
-			}
 
 			//SEND
-			
+			}
 
 			
 			mtype = FROM_WORKER;
@@ -400,17 +399,17 @@ int main(int argc, char** argv)
 		}
 
 
-	}
+	}	
 
 	
 	MPI_Finalize();
 
 
 	return 0;
-}
+	}
 //****************************************************************************80
 
-int i4_min(int i1, int i2)
+
 
 //****************************************************************************80
 //
@@ -436,6 +435,7 @@ int i4_min(int i1, int i2)
 //
 //    Output, int I4_MIN, the smaller of I1 and I2.
 //
+int i4_min(int i1, int i2)
 {
 	int value;
 
@@ -451,7 +451,6 @@ int i4_min(int i1, int i2)
 }
 //****************************************************************************80
 
-void i4pp_delete(int** a, int m, int n)
 
 //****************************************************************************80
 //
@@ -484,6 +483,7 @@ void i4pp_delete(int** a, int m, int n)
 //
 //    Input, int M, N, the number of rows and columns in the array.
 //
+void i4pp_delete(int** a, int m, int n)
 {
 	int i;
 
@@ -498,7 +498,6 @@ void i4pp_delete(int** a, int m, int n)
 }
 //****************************************************************************80
 
-int** i4pp_new(int m, int n)
 
 //****************************************************************************80
 //
@@ -536,6 +535,7 @@ int** i4pp_new(int m, int n)
 //
 //    Output, int **I4PP_NEW, a pointer to the pointers to the array.
 //
+int** i4pp_new(int m, int n)
 {
 	int** a;
 	int i;
@@ -566,7 +566,6 @@ int** i4pp_new(int m, int n)
 }
 //****************************************************************************80
 
-void timestamp()
 
 //****************************************************************************80
 //
@@ -594,6 +593,7 @@ void timestamp()
 //
 //    None
 //
+void timestamp()
 {
 # define TIME_SIZE 40
 
