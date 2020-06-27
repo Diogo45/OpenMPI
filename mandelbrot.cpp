@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
 
-	printf("MPI process rank %d started", my_rank);
+	printf("MPI process rank %d started\n", my_rank);
 
 
 	b = i4pp_new(m, n);
@@ -162,8 +162,8 @@ int main(int argc, char** argv)
 		{
 			if(extra > 0)
 			{
-				rows = averow + 1;
-				extra--;
+				rows = averow + extra;
+				extra = 0;
 			}
 			else
 			{
