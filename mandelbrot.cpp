@@ -326,7 +326,7 @@ int main(int argc, char** argv)
 			MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 			MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
-			omp_set_num_threads(12);
+			omp_set_num_threads(8);
 			
 			//printf("Process %d processing offset: %d rows: %d\n", my_rank, offset, rows);
 
