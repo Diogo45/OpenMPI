@@ -57,8 +57,8 @@ int main(int argc, char** argv)
 //
 {
 
-	int m = 1000; //tamanho da imagem em linhas
-	int n = 1000; //tamanho da imagem em colunas
+	int m = 16000; //tamanho da imagem em linhas
+	int n = 16000; //tamanho da imagem em colunas
 
 	int** b;
 	int c;
@@ -162,8 +162,8 @@ int main(int argc, char** argv)
 		{
 			if(extra > 0)
 			{
-				rows = averow + extra;
-				extra = 0;
+				rows = averow + 1;
+				extra--;
 			}
 			else
 			{
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 		mtype = FROM_WORKER;
 		
 		int task_completed = 0;
-		printf("Started receiving results");
+		printf("Started receiving results\n");
 
 		while(task_completed < tasks)
 		{
@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 
-			printf("Master receibed offset: %d rows: %d from process %d", offset, rows, source);
+			printf("Master receibed offset: %d rows: %d from process %d\n", offset, rows, source);
 
 
 			task_completed++;
@@ -264,29 +264,29 @@ int main(int argc, char** argv)
 		///*
 		//  Write data to an ASCII PPM file.
 		//*/
-		output.open(filename.c_str());
+		// output.open(filename.c_str());
 
-		output << "P3\n";
-		output << n << "  " << m << "\n";
-		output << 255 << "\n";
-		for (i = 0; i < m; i++)
-		{
-			for (jlo = 0; jlo < n; jlo = jlo + 4)
-			{
-				jhi = i4_min(jlo + 4, n);
-				for (j = jlo; j < jhi; j++)
-				{
-					output << "  " << r[i][j]
-						<< "  " << g[i][j]
-						<< "  " << b[i][j] << "\n";
-				}
-				output << "\n";
-			}
-		}
+		// output << "P3\n";
+		// output << n << "  " << m << "\n";
+		// output << 255 << "\n";
+		// for (i = 0; i < m; i++)
+		// {
+		// 	for (jlo = 0; jlo < n; jlo = jlo + 4)
+		// 	{
+		// 		jhi = i4_min(jlo + 4, n);
+		// 		for (j = jlo; j < jhi; j++)
+		// 		{
+		// 			output << "  " << r[i][j]
+		// 				<< "  " << g[i][j]
+		// 				<< "  " << b[i][j] << "\n";
+		// 		}
+		// 		output << "\n";
+		// 	}
+		// }
 
-		output.close();
-		std::cout << "\n";
-		std::cout << "  Graphics data written to \"" << filename << "\".\n";
+		// output.close();
+		// std::cout << "\n";
+		// std::cout << "  Graphics data written to \"" << filename << "\".\n";
 
 		/*
 		Free memory.
@@ -328,7 +328,7 @@ int main(int argc, char** argv)
 
 			omp_set_num_threads(16);
 			
-			printf("Process %d processing offset: %d rows: %d", my_rank, offset, rows);
+			printf("Process %d processing offset: %d rows: %d\n", my_rank, offset, rows);
 
 			# pragma omp parallel \
 			shared ( b, count, count_max, g, r, x_max, x_min, y_max, y_min ) \
@@ -395,7 +395,7 @@ int main(int argc, char** argv)
 			//SEND
 			}
 
-			printf("Process %d finished offset: %d rows: %d", my_rank, offset, rows);
+			printf("Process %d finished offset: %d rows: %d\n", my_rank, offset, rows);
 
 			mtype = FROM_WORKER;
 
@@ -406,7 +406,7 @@ int main(int argc, char** argv)
 			MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 
-			printf("Process %d sent results offset: %d rows: %d", my_rank, offset, rows);
+			printf("Process %d sent results offset: %d rows: %d\n", my_rank, offset, rows);
 
 			
 		}
