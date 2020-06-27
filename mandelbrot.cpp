@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 		mtype = FROM_WORKER;
 		
 		int task_completed = 0;
-		printf("Started receiving results\n");
+		//printf("Started receiving results\n");
 
 		while(task_completed < tasks)
 		{
@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 
-			printf("Master receibed offset: %d rows: %d from process %d\n", offset, rows, source);
+			//printf("Master receibed offset: %d rows: %d from process %d\n", offset, rows, source);
 
 
 			task_completed++;
@@ -328,7 +328,7 @@ int main(int argc, char** argv)
 
 			omp_set_num_threads(16);
 			
-			printf("Process %d processing offset: %d rows: %d\n", my_rank, offset, rows);
+			//printf("Process %d processing offset: %d rows: %d\n", my_rank, offset, rows);
 
 			# pragma omp parallel \
 			shared ( b, count, count_max, g, r, x_max, x_min, y_max, y_min ) \
@@ -395,7 +395,7 @@ int main(int argc, char** argv)
 			//SEND
 			}
 
-			printf("Process %d finished offset: %d rows: %d\n", my_rank, offset, rows);
+			//printf("Process %d finished offset: %d rows: %d\n", my_rank, offset, rows);
 
 			mtype = FROM_WORKER;
 
@@ -406,7 +406,7 @@ int main(int argc, char** argv)
 			MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 
-			printf("Process %d sent results offset: %d rows: %d\n", my_rank, offset, rows);
+			//printf("Process %d sent results offset: %d rows: %d\n", my_rank, offset, rows);
 
 			
 		}
