@@ -57,8 +57,8 @@ int main(int argc, char** argv)
 //
 {
 
-	int m = 16000; //tamanho da imagem em linhas
-	int n = 16000; //tamanho da imagem em colunas
+	int m = 1000; //tamanho da imagem em linhas
+	int n = 1000; //tamanho da imagem em colunas
 
 	int** b;
 	int c;
@@ -99,6 +99,9 @@ int main(int argc, char** argv)
 	MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD,&proc_n);
+
+	prinf("MPI process rank %d started", my_rank);
+
 
 	b = i4pp_new(m, n);
 	count = i4pp_new(m, n);
@@ -186,7 +189,7 @@ int main(int argc, char** argv)
 		// (task_completed >= tasks)
 
 		mtype = FROM_WORKER;
-
+		
 		int task_completed = 0;
 		printf("Started receiving results");
 
@@ -194,6 +197,7 @@ int main(int argc, char** argv)
 		{
 			
 			mtype = FROM_WORKER;
+
 
 			//Para que nao fiquemos presos esperadando um worker com id especifico, inicialmente
 			// aceitamos mensagens de  MPI_ANY_SOURCE, ou seja, de qualquer id, desde que o tipo de
@@ -206,11 +210,16 @@ int main(int argc, char** argv)
 			MPI_Recv(&g[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 			MPI_Recv(&b[offset][0], rows*n, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
 
+			printf("Master receibed offset: %d rows: %d from process %d", offset, rows, source);
+
+
 			task_completed++;
 
 			if(last_sched_offset < m){
 				
 				mtype = FROM_MASTER;
+
+				printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
 				//distribui linhas do resto se necessário
 				if(extra > 0)
@@ -318,7 +327,8 @@ int main(int argc, char** argv)
 			MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
 
 			omp_set_num_threads(16);
-
+			
+			printf("Process %d processing offset: %d rows: %d", my_rank, offset, rows);
 
 			# pragma omp parallel \
 			shared ( b, count, count_max, g, r, x_max, x_min, y_max, y_min ) \
@@ -385,7 +395,8 @@ int main(int argc, char** argv)
 			//SEND
 			}
 
-			
+			printf("Process %d finished offset: %d rows: %d", my_rank, offset, rows);
+
 			mtype = FROM_WORKER;
 
 			//envia os dados para o mestre incluindo informações RGB calculadas e OFFSET e ROWS para a área da imagem calculada
@@ -395,6 +406,7 @@ int main(int argc, char** argv)
 			MPI_Send(&g[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 			MPI_Send(&b[offset][0], rows*n, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
 
+			printf("Process %d sent results offset: %d rows: %d", my_rank, offset, rows);
 
 			
 		}
